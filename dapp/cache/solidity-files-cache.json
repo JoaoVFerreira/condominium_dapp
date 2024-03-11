@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\Condominium.sol": {
-      "lastModificationDate": 1710172819298,
-      "contentHash": "aac3ce52aeb0ba237e5c518bc5009009",
+      "lastModificationDate": 1710197041316,
+      "contentHash": "62e43a2f867b4c6e9001705977aaab06",
       "sourceName": "contracts/Condominium.sol",
       "solcConfig": {
         "version": "0.8.24",

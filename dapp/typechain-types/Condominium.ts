@@ -24,14 +24,20 @@ import type {
 export interface CondominiumInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "addResident"
       | "counselors"
       | "isResident"
       | "manager"
+      | "removeResident"
       | "residenceExists"
       | "residences"
       | "residents"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "addResident",
+    values: [AddressLike, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "counselors",
     values: [AddressLike]
@@ -41,6 +47,10 @@ export interface CondominiumInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "manager", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "removeResident",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "residenceExists",
     values: [BigNumberish]
@@ -54,9 +64,17 @@ export interface CondominiumInterface extends Interface {
     values: [AddressLike]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addResident",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "counselors", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isResident", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "manager", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "removeResident",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "residenceExists",
     data: BytesLike
@@ -108,11 +126,23 @@ export interface Condominium extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  addResident: TypedContractMethod<
+    [resident: AddressLike, residenceNumber: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   counselors: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
   isResident: TypedContractMethod<[resident: AddressLike], [boolean], "view">;
 
   manager: TypedContractMethod<[], [string], "view">;
+
+  removeResident: TypedContractMethod<
+    [resident: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   residenceExists: TypedContractMethod<
     [residence: BigNumberish],
@@ -129,6 +159,13 @@ export interface Condominium extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "addResident"
+  ): TypedContractMethod<
+    [resident: AddressLike, residenceNumber: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "counselors"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
@@ -137,6 +174,9 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "manager"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "removeResident"
+  ): TypedContractMethod<[resident: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "residenceExists"
   ): TypedContractMethod<[residence: BigNumberish], [boolean], "view">;

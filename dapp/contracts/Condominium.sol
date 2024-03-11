@@ -43,4 +43,14 @@ contract Condominium {
   function residenceExists(uint16 residence) public view returns (bool) {
     return residences[residence];
   }
+
+  function addResident(address resident, uint16 residenceNumber) external onlyCouncil {
+    require(residenceExists(residenceNumber), "This residence does not exists");
+    residents[resident] = residenceNumber;
+  }
+
+  function removeResident(address resident) external onlyManager {
+    require(!counselors[resident], "A councelor cannot be removed");
+    delete residents[resident];
+  }
 }
