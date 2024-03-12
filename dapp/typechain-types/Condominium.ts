@@ -21,19 +21,56 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export declare namespace Condominium {
+  export type TopicStruct = {
+    title: string;
+    description: string;
+    status: BigNumberish;
+    createdDate: BigNumberish;
+    startDate: BigNumberish;
+    endDate: BigNumberish;
+  };
+
+  export type TopicStructOutput = [
+    title: string,
+    description: string,
+    status: bigint,
+    createdDate: bigint,
+    startDate: bigint,
+    endDate: bigint
+  ] & {
+    title: string;
+    description: string;
+    status: bigint;
+    createdDate: bigint;
+    startDate: bigint;
+    endDate: bigint;
+  };
+}
+
 export interface CondominiumInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "addResident"
+      | "addTopic"
+      | "closeVoting"
       | "counselors"
+      | "getTopic"
       | "isResident"
       | "manager"
+      | "numberOfVotes"
+      | "openVoting"
       | "removeResident"
+      | "removeTopic"
       | "residenceExists"
       | "residences"
       | "residents"
       | "setCounselor"
       | "setManager"
+      | "topicExists"
+      | "topics"
+      | "vote"
+      | "votings"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -41,18 +78,30 @@ export interface CondominiumInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "addTopic",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(functionFragment: "closeVoting", values: [string]): string;
+  encodeFunctionData(
     functionFragment: "counselors",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "getTopic", values: [string]): string;
   encodeFunctionData(
     functionFragment: "isResident",
     values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "manager", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "numberOfVotes",
+    values: [string]
+  ): string;
+  encodeFunctionData(functionFragment: "openVoting", values: [string]): string;
+  encodeFunctionData(
     functionFragment: "removeResident",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "removeTopic", values: [string]): string;
   encodeFunctionData(
     functionFragment: "residenceExists",
     values: [BigNumberish]
@@ -73,16 +122,41 @@ export interface CondominiumInterface extends Interface {
     functionFragment: "setManager",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "topicExists", values: [string]): string;
+  encodeFunctionData(functionFragment: "topics", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "vote",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "votings",
+    values: [BytesLike, BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "addResident",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "addTopic", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "closeVoting",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "counselors", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getTopic", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isResident", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "manager", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "numberOfVotes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "openVoting", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "removeResident",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "removeTopic",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -96,6 +170,13 @@ export interface CondominiumInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "topicExists",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "topics", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "votings", data: BytesLike): Result;
 }
 
 export interface Condominium extends BaseContract {
@@ -147,17 +228,37 @@ export interface Condominium extends BaseContract {
     "nonpayable"
   >;
 
+  addTopic: TypedContractMethod<
+    [title: string, description: string],
+    [void],
+    "nonpayable"
+  >;
+
+  closeVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
+
   counselors: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+
+  getTopic: TypedContractMethod<
+    [title: string],
+    [Condominium.TopicStructOutput],
+    "view"
+  >;
 
   isResident: TypedContractMethod<[resident: AddressLike], [boolean], "view">;
 
   manager: TypedContractMethod<[], [string], "view">;
+
+  numberOfVotes: TypedContractMethod<[title: string], [bigint], "view">;
+
+  openVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
   removeResident: TypedContractMethod<
     [resident: AddressLike],
     [void],
     "nonpayable"
   >;
+
+  removeTopic: TypedContractMethod<[title: string], [void], "nonpayable">;
 
   residenceExists: TypedContractMethod<
     [residence: BigNumberish],
@@ -181,6 +282,42 @@ export interface Condominium extends BaseContract {
     "nonpayable"
   >;
 
+  topicExists: TypedContractMethod<[title: string], [boolean], "view">;
+
+  topics: TypedContractMethod<
+    [arg0: BytesLike],
+    [
+      [string, string, bigint, bigint, bigint, bigint] & {
+        title: string;
+        description: string;
+        status: bigint;
+        createdDate: bigint;
+        startDate: bigint;
+        endDate: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  vote: TypedContractMethod<
+    [title: string, option: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  votings: TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [
+      [string, bigint, bigint, bigint] & {
+        resident: string;
+        residence: bigint;
+        option: bigint;
+        timestamp: bigint;
+      }
+    ],
+    "view"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -193,8 +330,25 @@ export interface Condominium extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "addTopic"
+  ): TypedContractMethod<
+    [title: string, description: string],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "closeVoting"
+  ): TypedContractMethod<[title: string], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "counselors"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "getTopic"
+  ): TypedContractMethod<
+    [title: string],
+    [Condominium.TopicStructOutput],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "isResident"
   ): TypedContractMethod<[resident: AddressLike], [boolean], "view">;
@@ -202,8 +356,17 @@ export interface Condominium extends BaseContract {
     nameOrSignature: "manager"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "numberOfVotes"
+  ): TypedContractMethod<[title: string], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "openVoting"
+  ): TypedContractMethod<[title: string], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "removeResident"
   ): TypedContractMethod<[resident: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "removeTopic"
+  ): TypedContractMethod<[title: string], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "residenceExists"
   ): TypedContractMethod<[residence: BigNumberish], [boolean], "view">;
@@ -223,6 +386,46 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "setManager"
   ): TypedContractMethod<[newManager: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "topicExists"
+  ): TypedContractMethod<[title: string], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "topics"
+  ): TypedContractMethod<
+    [arg0: BytesLike],
+    [
+      [string, string, bigint, bigint, bigint, bigint] & {
+        title: string;
+        description: string;
+        status: bigint;
+        createdDate: bigint;
+        startDate: bigint;
+        endDate: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "vote"
+  ): TypedContractMethod<
+    [title: string, option: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "votings"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [
+      [string, bigint, bigint, bigint] & {
+        resident: string;
+        residence: bigint;
+        option: bigint;
+        timestamp: bigint;
+      }
+    ],
+    "view"
+  >;
 
   filters: {};
 }
