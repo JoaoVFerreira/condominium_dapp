@@ -32,6 +32,8 @@ export interface CondominiumInterface extends Interface {
       | "residenceExists"
       | "residences"
       | "residents"
+      | "setCounselor"
+      | "setManager"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -63,6 +65,14 @@ export interface CondominiumInterface extends Interface {
     functionFragment: "residents",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "setCounselor",
+    values: [AddressLike, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setManager",
+    values: [AddressLike]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "addResident",
@@ -81,6 +91,11 @@ export interface CondominiumInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "residences", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "residents", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setCounselor",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
 }
 
 export interface Condominium extends BaseContract {
@@ -154,6 +169,18 @@ export interface Condominium extends BaseContract {
 
   residents: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  setCounselor: TypedContractMethod<
+    [resident: AddressLike, isEntering: boolean],
+    [void],
+    "nonpayable"
+  >;
+
+  setManager: TypedContractMethod<
+    [newManager: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -186,6 +213,16 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "residents"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "setCounselor"
+  ): TypedContractMethod<
+    [resident: AddressLike, isEntering: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setManager"
+  ): TypedContractMethod<[newManager: AddressLike], [void], "nonpayable">;
 
   filters: {};
 }

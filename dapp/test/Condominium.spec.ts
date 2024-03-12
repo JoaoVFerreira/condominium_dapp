@@ -68,4 +68,58 @@ describe("Condominium", function () {
     await expect(instance.removeResident(resident.address))
       .to.be.revertedWith("Only the manager has access to this functionality")
   });
+
+  it('Should throw an error when trying to remove a counselor resident', async () => {
+    const { contract, resident } = await loadFixture(deployFixture);
+    await contract.addResident(resident.address, RESIDENCE_NUMBER);
+    await contract.setCounselor(resident.address, true);
+
+    await expect(contract.removeResident(resident.address))
+      .to.be.revertedWith("A counselor cannot be removed")
+  });
+
+  it('Should set a different manager', async () => {
+    const { contract, resident } = await loadFixture(deployFixture);
+    const oldManager = await contract.manager();
+    await contract.setManager(resident.address);
+    const newManager = await contract.manager();
+
+    expect(newManager).to.be.equal(resident.address);
+    expect(oldManager).not.to.be.equal(newManager);
+  });
+
+  it('Should throw an error when trying to set an invalid manager', async () => {
+    const { contract } = await loadFixture(deployFixture);
+    
+    await expect(contract.setManager('0x0000000000000000000000000000000000000000'))
+      .to.be.revertedWith("The address must be valid");
+  });
+
+  it('Should set a counselor with success', async () => {
+    const { contract, resident } = await loadFixture(deployFixture);
+    await contract.addResident(resident.address, RESIDENCE_NUMBER);
+    await contract.setCounselor(resident.address, true);
+    const result = await contract.counselors(resident.address);
+
+    expect(result).to.be.true;
+  });
+
+  it('Should throw an error when trying to set a counselor that is not a resident', async () => {
+    const { contract, resident } = await loadFixture(deployFixture);
+    
+    await expect(contract.setCounselor(resident.address, true))
+      .to.be.revertedWith("The counselor must be a resident");
+  });
+
+  it('Should delete a counselor with success', async () => {
+    const { contract, resident } = await loadFixture(deployFixture);
+    await contract.addResident(resident.address, RESIDENCE_NUMBER);
+    await contract.setCounselor(resident.address, true);
+    const counselor = await contract.counselors(resident.address);
+    await contract.setCounselor(resident.address, false);
+    const counselorRemoved = await contract.counselors(resident.address);
+
+    expect(counselor).to.be.true;
+    expect(counselorRemoved).to.equal(false);
+  });
 });
