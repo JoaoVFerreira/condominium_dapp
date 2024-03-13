@@ -2,4 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export { Condominium__factory } from "./Condominium__factory";
+export { CondominiumAdapter__factory } from "./CondominiumAdapter__factory";
 export { ICondominium__factory } from "./ICondominium__factory";

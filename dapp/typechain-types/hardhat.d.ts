@@ -18,6 +18,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Condominium__factory>;
     getContractFactory(
+      name: "CondominiumAdapter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CondominiumAdapter__factory>;
+    getContractFactory(
       name: "ICondominium",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ICondominium__factory>;
@@ -28,6 +32,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Condominium>;
     getContractAt(
+      name: "CondominiumAdapter",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CondominiumAdapter>;
+    getContractAt(
       name: "ICondominium",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -38,6 +47,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Condominium>;
     deployContract(
+      name: "CondominiumAdapter",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CondominiumAdapter>;
+    deployContract(
       name: "ICondominium",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ICondominium>;
@@ -47,6 +60,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Condominium>;
+    deployContract(
+      name: "CondominiumAdapter",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CondominiumAdapter>;
     deployContract(
       name: "ICondominium",
       args: any[],
