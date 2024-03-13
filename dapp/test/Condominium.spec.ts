@@ -18,15 +18,15 @@ enum Options {
   ABSTENTION = 3
 }
 
+async function deployFixture() {
+  const [manager, resident] = await ethers.getSigners();
+  const Condominium = await ethers.getContractFactory("Condominium");
+  const contract = await Condominium.deploy();
+
+  return { contract, manager, resident };
+}
+
 describe("Condominium", function () {
-  async function deployFixture() {
-    const [manager, resident] = await ethers.getSigners();
-    const Condominium = await ethers.getContractFactory("Condominium");
-    const contract = await Condominium.deploy();
-
-    return { contract, manager, resident };
-  }
-
   it('Should exists a given residence number', async () => {
     const { contract } = await loadFixture(deployFixture);
     const result = await contract.residenceExists(RESIDENCE_NUMBER);

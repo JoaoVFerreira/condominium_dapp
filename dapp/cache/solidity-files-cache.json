@@ -2,9 +2,48 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\Condominium.sol": {
-      "lastModificationDate": 1710286257969,
-      "contentHash": "a4502aa1ad488392bc5160f3cb147da3",
+      "lastModificationDate": 1710351956465,
+      "contentHash": "a4cc0c45b07b27ecc108c9d1f59cb8ff",
       "sourceName": "contracts/Condominium.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./CondominiumLib.sol",
+        "./ICondominium.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "Condominium"
+      ]
+    },
+    "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\CondominiumLib.sol": {
+      "lastModificationDate": 1710351470785,
+      "contentHash": "1ddcacffe7dbab8f409daa79549b1fdf",
+      "sourceName": "contracts/CondominiumLib.sol",
       "solcConfig": {
         "version": "0.8.24",
         "settings": {
@@ -34,7 +73,45 @@
         "^0.8.24"
       ],
       "artifacts": [
-        "Condominium"
+        "CondominiumLib"
+      ]
+    },
+    "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\ICondominium.sol": {
+      "lastModificationDate": 1710351671709,
+      "contentHash": "9def0c96ab0736107503ff5e9c0a8941",
+      "sourceName": "contracts/ICondominium.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./CondominiumLib.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "ICondominium"
       ]
     }
   }

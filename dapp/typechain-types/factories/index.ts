@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { Condominium__factory } from "./Condominium__factory";
+export { ICondominium__factory } from "./ICondominium__factory";

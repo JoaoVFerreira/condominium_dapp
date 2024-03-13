@@ -2,5 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { Condominium } from "./Condominium";
+export type { ICondominium } from "./ICondominium";
 export * as factories from "./factories";
 export { Condominium__factory } from "./factories/Condominium__factory";
+export { ICondominium__factory } from "./factories/ICondominium__factory";
