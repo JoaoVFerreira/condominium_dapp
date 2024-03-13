@@ -16,29 +16,27 @@ contract Condominium is ICondominium {
 
   constructor() {
     manager = msg.sender;
-    for(uint8 i = 1; i<= 2; i++) { // blocks
-      for(uint8 j = 1; j <= 5; j++) { // floors
-        for(uint8 k = 1; k <= 5; k++) { // units
-          unchecked {
-            residences[(i * 1000) + (j * 100) + k] = true; // (1101) -> (2505)
-          }
+    for(uint16 i = 1; i<= 2; i++) { // blocks
+      for(uint16 j = 1; j <= 5; j++) { // floors
+        for(uint16 k = 1; k <= 5; k++) { // units
+          residences[(i * 1000) + (j * 100) + k] = true; // (1101) -> (2505)
         }
       }
     }
   }
 
   modifier onlyManager () {
-    require(msg.sender == manager, "Only the manager has access to this functionality");
+    require(tx.origin == manager, "Only the manager has access to this functionality");
     _;
   }
 
   modifier onlyCouncil () {
-    require(msg.sender == manager || counselors[msg.sender], "Only the counselors or manager have access to this functionality");
+    require(tx.origin == manager || counselors[tx.origin], "Only the counselors or manager have access to this functionality");
     _;
   }
 
   modifier onlyResidents () { 
-    require(msg.sender == manager || isResident(msg.sender), "Only the residents or manager have access to this functionality");
+    require(tx.origin == manager || isResident(tx.origin), "Only the residents or manager have access to this functionality");
     _;
   }
 
@@ -153,7 +151,7 @@ contract Condominium is ICondominium {
     require(topic.createdDate > 0, "This topic does not exists");
     require(topic.status == Lib.Status.VOTING, "Only VOTING topics can be voted");
 
-    uint16 residence = residents[msg.sender];
+    uint16 residence = residents[tx.origin];
     bytes32 topicId = keccak256(bytes(title));
 
     Lib.Vote[] memory votes = votings[topicId];
@@ -165,7 +163,7 @@ contract Condominium is ICondominium {
     }
 
     Lib.Vote memory newVote = Lib.Vote({
-      resident: msg.sender,
+      resident: tx.origin,
       residence: residence,
       option: option,
       timestamp: block.timestamp

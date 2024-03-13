@@ -27,6 +27,7 @@ export interface CondominiumAdapterInterface extends Interface {
       | "addResident"
       | "addTopic"
       | "closeVoting"
+      | "getImplementationAddress"
       | "numberOfVotes"
       | "openVoting"
       | "owner"
@@ -47,6 +48,10 @@ export interface CondominiumAdapterInterface extends Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "closeVoting", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getImplementationAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "numberOfVotes",
     values: [string]
@@ -82,6 +87,10 @@ export interface CondominiumAdapterInterface extends Interface {
   decodeFunctionResult(functionFragment: "addTopic", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "closeVoting",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getImplementationAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -164,6 +173,8 @@ export interface CondominiumAdapter extends BaseContract {
 
   closeVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
+  getImplementationAddress: TypedContractMethod<[], [string], "view">;
+
   numberOfVotes: TypedContractMethod<[title: string], [bigint], "view">;
 
   openVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
@@ -223,6 +234,9 @@ export interface CondominiumAdapter extends BaseContract {
   getFunction(
     nameOrSignature: "closeVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "getImplementationAddress"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "numberOfVotes"
   ): TypedContractMethod<[title: string], [bigint], "view">;

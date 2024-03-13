@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\Condominium.sol": {
-      "lastModificationDate": 1710353433897,
-      "contentHash": "7de2e7e1b455863a0eaf4b2559bcdcbd",
+      "lastModificationDate": 1710361188294,
+      "contentHash": "36859792d2bf00c98d1d4c23a403c943",
       "sourceName": "contracts/Condominium.sol",
       "solcConfig": {
         "version": "0.8.24",
@@ -26,6 +26,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -65,6 +68,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -101,6 +107,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -115,8 +124,8 @@
       ]
     },
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\CondominiumAdapter.sol": {
-      "lastModificationDate": 1710353366991,
-      "contentHash": "0a926555ebcf83771e488afa88f5f12f",
+      "lastModificationDate": 1710358249306,
+      "contentHash": "51f898bfc72655f82c0abf00fc795c2b",
       "sourceName": "contracts/CondominiumAdapter.sol",
       "solcConfig": {
         "version": "0.8.24",
@@ -139,6 +148,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
