@@ -27,12 +27,10 @@ export interface ICondominiumInterface extends Interface {
       | "addResident"
       | "addTopic"
       | "closeVoting"
-      | "numberOfVotes"
       | "openVoting"
       | "removeResident"
       | "removeTopic"
       | "setCounselor"
-      | "setManager"
       | "vote"
   ): FunctionFragment;
 
@@ -42,13 +40,9 @@ export interface ICondominiumInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addTopic",
-    values: [string, string]
+    values: [string, string, BigNumberish, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "closeVoting", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "numberOfVotes",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "openVoting", values: [string]): string;
   encodeFunctionData(
     functionFragment: "removeResident",
@@ -58,10 +52,6 @@ export interface ICondominiumInterface extends Interface {
   encodeFunctionData(
     functionFragment: "setCounselor",
     values: [AddressLike, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setManager",
-    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "vote",
@@ -77,10 +67,6 @@ export interface ICondominiumInterface extends Interface {
     functionFragment: "closeVoting",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "numberOfVotes",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "openVoting", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "removeResident",
@@ -94,7 +80,6 @@ export interface ICondominiumInterface extends Interface {
     functionFragment: "setCounselor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
 }
 
@@ -148,14 +133,18 @@ export interface ICondominium extends BaseContract {
   >;
 
   addTopic: TypedContractMethod<
-    [title: string, description: string],
+    [
+      title: string,
+      description: string,
+      category: BigNumberish,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
 
   closeVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
-
-  numberOfVotes: TypedContractMethod<[title: string], [bigint], "view">;
 
   openVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
@@ -169,12 +158,6 @@ export interface ICondominium extends BaseContract {
 
   setCounselor: TypedContractMethod<
     [resident: AddressLike, isEntering: boolean],
-    [void],
-    "nonpayable"
-  >;
-
-  setManager: TypedContractMethod<
-    [newManager: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -199,16 +182,19 @@ export interface ICondominium extends BaseContract {
   getFunction(
     nameOrSignature: "addTopic"
   ): TypedContractMethod<
-    [title: string, description: string],
+    [
+      title: string,
+      description: string,
+      category: BigNumberish,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "closeVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "numberOfVotes"
-  ): TypedContractMethod<[title: string], [bigint], "view">;
   getFunction(
     nameOrSignature: "openVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;
@@ -225,9 +211,6 @@ export interface ICondominium extends BaseContract {
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "setManager"
-  ): TypedContractMethod<[newManager: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "vote"
   ): TypedContractMethod<

@@ -22,10 +22,6 @@ contract CondominiumAdapter {
     implementation = ICondominium(newImplementation);
   }
 
-  function numberOfVotes(string memory title) external view returns (uint256) {
-    return implementation.numberOfVotes(title);
-  }
-
   function vote(string memory title, Lib.VoteOptions option) external {
     return implementation.vote(title, option);
   }
@@ -42,12 +38,8 @@ contract CondominiumAdapter {
     return implementation.removeTopic(title);
   }
 
-  function addTopic(string memory title, string memory description) external {
-    return implementation.addTopic(title, description);
-  }
-
-  function setManager(address newManager) external {
-    return implementation.setManager(newManager);
+  function addTopic(string memory title, string memory description, Lib.Category category, uint amount, address responsible) external {
+    return implementation.addTopic(title, description, category, amount, responsible);
   }
 
   function setCounselor(address resident, bool isEntering) external {

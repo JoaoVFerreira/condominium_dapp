@@ -29,6 +29,9 @@ export declare namespace CondominiumLib {
     createdDate: BigNumberish;
     startDate: BigNumberish;
     endDate: BigNumberish;
+    category: BigNumberish;
+    amount: BigNumberish;
+    responsible: AddressLike;
   };
 
   export type TopicStructOutput = [
@@ -37,7 +40,10 @@ export declare namespace CondominiumLib {
     status: bigint,
     createdDate: bigint,
     startDate: bigint,
-    endDate: bigint
+    endDate: bigint,
+    category: bigint,
+    amount: bigint,
+    responsible: string
   ] & {
     title: string;
     description: string;
@@ -45,6 +51,9 @@ export declare namespace CondominiumLib {
     createdDate: bigint;
     startDate: bigint;
     endDate: bigint;
+    category: bigint;
+    amount: bigint;
+    responsible: string;
   };
 }
 
@@ -58,6 +67,7 @@ export interface CondominiumInterface extends Interface {
       | "getTopic"
       | "isResident"
       | "manager"
+      | "monthlyQuota"
       | "numberOfVotes"
       | "openVoting"
       | "removeResident"
@@ -66,7 +76,6 @@ export interface CondominiumInterface extends Interface {
       | "residences"
       | "residents"
       | "setCounselor"
-      | "setManager"
       | "topicExists"
       | "topics"
       | "vote"
@@ -79,7 +88,7 @@ export interface CondominiumInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addTopic",
-    values: [string, string]
+    values: [string, string, BigNumberish, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "closeVoting", values: [string]): string;
   encodeFunctionData(
@@ -92,6 +101,10 @@ export interface CondominiumInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "manager", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "monthlyQuota",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "numberOfVotes",
     values: [string]
@@ -118,10 +131,6 @@ export interface CondominiumInterface extends Interface {
     functionFragment: "setCounselor",
     values: [AddressLike, boolean]
   ): string;
-  encodeFunctionData(
-    functionFragment: "setManager",
-    values: [AddressLike]
-  ): string;
   encodeFunctionData(functionFragment: "topicExists", values: [string]): string;
   encodeFunctionData(functionFragment: "topics", values: [BytesLike]): string;
   encodeFunctionData(
@@ -147,6 +156,10 @@ export interface CondominiumInterface extends Interface {
   decodeFunctionResult(functionFragment: "isResident", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "manager", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "monthlyQuota",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "numberOfVotes",
     data: BytesLike
   ): Result;
@@ -169,7 +182,6 @@ export interface CondominiumInterface extends Interface {
     functionFragment: "setCounselor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "topicExists",
     data: BytesLike
@@ -229,7 +241,13 @@ export interface Condominium extends BaseContract {
   >;
 
   addTopic: TypedContractMethod<
-    [title: string, description: string],
+    [
+      title: string,
+      description: string,
+      category: BigNumberish,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -247,6 +265,8 @@ export interface Condominium extends BaseContract {
   isResident: TypedContractMethod<[resident: AddressLike], [boolean], "view">;
 
   manager: TypedContractMethod<[], [string], "view">;
+
+  monthlyQuota: TypedContractMethod<[], [bigint], "view">;
 
   numberOfVotes: TypedContractMethod<[title: string], [bigint], "view">;
 
@@ -276,24 +296,31 @@ export interface Condominium extends BaseContract {
     "nonpayable"
   >;
 
-  setManager: TypedContractMethod<
-    [newManager: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
   topicExists: TypedContractMethod<[title: string], [boolean], "view">;
 
   topics: TypedContractMethod<
     [arg0: BytesLike],
     [
-      [string, string, bigint, bigint, bigint, bigint] & {
+      [
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string
+      ] & {
         title: string;
         description: string;
         status: bigint;
         createdDate: bigint;
         startDate: bigint;
         endDate: bigint;
+        category: bigint;
+        amount: bigint;
+        responsible: string;
       }
     ],
     "view"
@@ -332,7 +359,13 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "addTopic"
   ): TypedContractMethod<
-    [title: string, description: string],
+    [
+      title: string,
+      description: string,
+      category: BigNumberish,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -355,6 +388,9 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "manager"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "monthlyQuota"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "numberOfVotes"
   ): TypedContractMethod<[title: string], [bigint], "view">;
@@ -384,9 +420,6 @@ export interface Condominium extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "setManager"
-  ): TypedContractMethod<[newManager: AddressLike], [void], "nonpayable">;
-  getFunction(
     nameOrSignature: "topicExists"
   ): TypedContractMethod<[title: string], [boolean], "view">;
   getFunction(
@@ -394,13 +427,26 @@ export interface Condominium extends BaseContract {
   ): TypedContractMethod<
     [arg0: BytesLike],
     [
-      [string, string, bigint, bigint, bigint, bigint] & {
+      [
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string
+      ] & {
         title: string;
         description: string;
         status: bigint;
         createdDate: bigint;
         startDate: bigint;
         endDate: bigint;
+        category: bigint;
+        amount: bigint;
+        responsible: string;
       }
     ],
     "view"

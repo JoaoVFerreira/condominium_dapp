@@ -28,13 +28,11 @@ export interface CondominiumAdapterInterface extends Interface {
       | "addTopic"
       | "closeVoting"
       | "getImplementationAddress"
-      | "numberOfVotes"
       | "openVoting"
       | "owner"
       | "removeResident"
       | "removeTopic"
       | "setCounselor"
-      | "setManager"
       | "upgrade"
       | "vote"
   ): FunctionFragment;
@@ -45,16 +43,12 @@ export interface CondominiumAdapterInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addTopic",
-    values: [string, string]
+    values: [string, string, BigNumberish, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "closeVoting", values: [string]): string;
   encodeFunctionData(
     functionFragment: "getImplementationAddress",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "numberOfVotes",
-    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "openVoting", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -66,10 +60,6 @@ export interface CondominiumAdapterInterface extends Interface {
   encodeFunctionData(
     functionFragment: "setCounselor",
     values: [AddressLike, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setManager",
-    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "upgrade",
@@ -93,10 +83,6 @@ export interface CondominiumAdapterInterface extends Interface {
     functionFragment: "getImplementationAddress",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "numberOfVotes",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "openVoting", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
@@ -111,7 +97,6 @@ export interface CondominiumAdapterInterface extends Interface {
     functionFragment: "setCounselor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setManager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "upgrade", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
 }
@@ -166,7 +151,13 @@ export interface CondominiumAdapter extends BaseContract {
   >;
 
   addTopic: TypedContractMethod<
-    [title: string, description: string],
+    [
+      title: string,
+      description: string,
+      category: BigNumberish,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -174,8 +165,6 @@ export interface CondominiumAdapter extends BaseContract {
   closeVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
   getImplementationAddress: TypedContractMethod<[], [string], "view">;
-
-  numberOfVotes: TypedContractMethod<[title: string], [bigint], "view">;
 
   openVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
@@ -191,12 +180,6 @@ export interface CondominiumAdapter extends BaseContract {
 
   setCounselor: TypedContractMethod<
     [resident: AddressLike, isEntering: boolean],
-    [void],
-    "nonpayable"
-  >;
-
-  setManager: TypedContractMethod<
-    [newManager: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -227,7 +210,13 @@ export interface CondominiumAdapter extends BaseContract {
   getFunction(
     nameOrSignature: "addTopic"
   ): TypedContractMethod<
-    [title: string, description: string],
+    [
+      title: string,
+      description: string,
+      category: BigNumberish,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -237,9 +226,6 @@ export interface CondominiumAdapter extends BaseContract {
   getFunction(
     nameOrSignature: "getImplementationAddress"
   ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "numberOfVotes"
-  ): TypedContractMethod<[title: string], [bigint], "view">;
   getFunction(
     nameOrSignature: "openVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;
@@ -259,9 +245,6 @@ export interface CondominiumAdapter extends BaseContract {
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "setManager"
-  ): TypedContractMethod<[newManager: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "upgrade"
   ): TypedContractMethod<

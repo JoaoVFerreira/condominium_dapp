@@ -36,6 +36,21 @@ const _abi = [
         name: "description",
         type: "string",
       },
+      {
+        internalType: "enum CondominiumLib.Category",
+        name: "category",
+        type: "uint8",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "responsible",
+        type: "address",
+      },
     ],
     name: "addTopic",
     outputs: [],
@@ -53,25 +68,6 @@ const _abi = [
     name: "closeVoting",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "title",
-        type: "string",
-      },
-    ],
-    name: "numberOfVotes",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -127,19 +123,6 @@ const _abi = [
       },
     ],
     name: "setCounselor",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newManager",
-        type: "address",
-      },
-    ],
-    name: "setManager",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

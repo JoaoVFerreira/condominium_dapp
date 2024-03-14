@@ -1,8 +1,11 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+// import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+// import { CondominiumAdapter } from "../typechain-types";
 
-const RESIDENCE_NUMBER = 2102;
+const RESIDENCE_NUMBER = 2101;
+const ZERO_AMOUNT = 0;
 const TOPIC_TITLE = 'Installing speed bumps';
 const TOPIC_DESCRIPTION = 'Installing speed bumps to slow down speeding drivers';
 enum Status {
@@ -16,6 +19,12 @@ enum Options {
   YES = 1,
   NO = 2,
   ABSTENTION = 3
+}
+enum Category {
+  DECISION = 0,
+  SPENT = 1,
+  CHANGE_QUOTA = 2,
+  CHANGE_MANAGER = 3
 }
 
 async function deployAdapterFixture() {
@@ -97,20 +106,22 @@ describe('CondominiumAdapter', () => {
   });
 
   it('Should add topic with success', async () => {
-    const { adapter } = await loadFixture(deployAdapterFixture);
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
     await adapter.upgrade(contract.getAddress());
-    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     const result = await contract.topicExists(TOPIC_TITLE);
 
     expect(result).to.equal(true);
   });
 
   it('Should remove topic with success', async () => {
-    const { adapter } = await loadFixture(deployAdapterFixture);
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
     await adapter.upgrade(contract.getAddress());
-    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.removeTopic(TOPIC_TITLE);
     const result = await contract.topicExists(TOPIC_TITLE);
 
@@ -118,10 +129,11 @@ describe('CondominiumAdapter', () => {
   });
 
   it('Should open voting with success', async () => {
-    const { adapter } = await loadFixture(deployAdapterFixture);
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
     await adapter.upgrade(contract.getAddress());
-    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.openVoting(TOPIC_TITLE);
     const result = await contract.getTopic(TOPIC_TITLE);
 
@@ -131,9 +143,10 @@ describe('CondominiumAdapter', () => {
   it('Should vote with success', async () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
     await adapter.upgrade(contract.getAddress());
     await adapter.addResident(await accounts[1].getAddress(), RESIDENCE_NUMBER);
-    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.openVoting(TOPIC_TITLE);
     const instance = adapter.connect(accounts[1])
     await instance.vote(TOPIC_TITLE, Options.YES);
@@ -143,17 +156,34 @@ describe('CondominiumAdapter', () => {
   });
 
   it('Should closeVoting with success', async () => {
-    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const { adapter, accounts, manager } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
     await adapter.upgrade(contract.getAddress());
-    await adapter.addResident(await accounts[1].getAddress(), RESIDENCE_NUMBER);
-    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager.address);
     await adapter.openVoting(TOPIC_TITLE);
-    const instance = adapter.connect(accounts[1])
-    await instance.vote(TOPIC_TITLE, Options.YES);
+    Array.from({ length: 5 }, async (_, index) => {
+      await adapter.addResident(accounts[index].address, RESIDENCE_NUMBER + index);
+    });
+    Array.from({ length: 5 }, async (_, index) => {
+      const instance = adapter.connect(accounts[index])
+      await instance.vote(TOPIC_TITLE, Options.YES);
+    });
     await adapter.closeVoting(TOPIC_TITLE);
     const result = await contract.getTopic(TOPIC_TITLE);
 
     expect(result.status).to.equal(Status.APPROVED);
   });
 });
+
+/* async function addResidents(adapter: CondominiumAdapter, length: number, accounts: SignerWithAddress[]) {
+  for (let i = 1; i < length; i++) {
+    await adapter.addResident(accounts[i].address, RESIDENCE_NUMBER + i);
+  }
+}
+
+async function addVotes(adapter: CondominiumAdapter, length: number, accounts: SignerWithAddress[]) {
+  for (let i = 1; i < length; i++) {
+    const instace = adapter.connect(accounts[i]);
+    await instace.vote(TOPIC_TITLE, Options.YES);
+  }
+} */
