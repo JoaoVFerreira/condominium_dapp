@@ -1,8 +1,8 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-// import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-// import { CondominiumAdapter } from "../typechain-types";
+import { CondominiumAdapter } from "../typechain-types";
 
 const RESIDENCE_NUMBER = 2101;
 const ZERO_AMOUNT = 0;
@@ -25,6 +25,22 @@ enum Category {
   SPENT = 1,
   CHANGE_QUOTA = 2,
   CHANGE_MANAGER = 3
+}
+
+async function addResidents(adapter: CondominiumAdapter, count: number, accounts: SignerWithAddress[]) {
+  const skip = count < 20 ? 0 : 1;
+  for (let i = 1; i <= count; i++) {
+    const residenceId = (1000 * Math.ceil(i / 25)) + (100 * Math.ceil(i / 5)) + (i - (5 * Math.floor((i - 1) / 5)));
+    await adapter.addResident(accounts[i - skip].address, residenceId); //1 101
+  }
+}
+
+async function addVotes(adapter: CondominiumAdapter, count: number, accounts: SignerWithAddress[], deny: boolean = false) {
+  const skip = count < 20 ? 0 : 1;
+  for (let i = 1; i <= count; i++) {
+    const instance = adapter.connect(accounts[i - skip]);
+    await instance.vote(TOPIC_TITLE, deny ? Options.NO : Options.YES);
+  }
 }
 
 async function deployAdapterFixture() {
@@ -158,32 +174,15 @@ describe('CondominiumAdapter', () => {
   it('Should closeVoting with success', async () => {
     const { adapter, accounts, manager } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
-    await adapter.upgrade(contract.getAddress());
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await addResidents(adapter, 5, accounts);
     await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager.address);
     await adapter.openVoting(TOPIC_TITLE);
-    Array.from({ length: 5 }, async (_, index) => {
-      await adapter.addResident(accounts[index].address, RESIDENCE_NUMBER + index);
-    });
-    Array.from({ length: 5 }, async (_, index) => {
-      const instance = adapter.connect(accounts[index])
-      await instance.vote(TOPIC_TITLE, Options.YES);
-    });
+    await addVotes(adapter, 5, accounts);
     await adapter.closeVoting(TOPIC_TITLE);
     const result = await contract.getTopic(TOPIC_TITLE);
 
     expect(result.status).to.equal(Status.APPROVED);
   });
 });
-
-/* async function addResidents(adapter: CondominiumAdapter, length: number, accounts: SignerWithAddress[]) {
-  for (let i = 1; i < length; i++) {
-    await adapter.addResident(accounts[i].address, RESIDENCE_NUMBER + i);
-  }
-}
-
-async function addVotes(adapter: CondominiumAdapter, length: number, accounts: SignerWithAddress[]) {
-  for (let i = 1; i < length; i++) {
-    const instace = adapter.connect(accounts[i]);
-    await instace.vote(TOPIC_TITLE, Options.YES);
-  }
-} */
