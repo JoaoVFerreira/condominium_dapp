@@ -64,6 +64,7 @@ export interface CondominiumInterface extends Interface {
       | "addTopic"
       | "closeVoting"
       | "counselors"
+      | "editTopic"
       | "getTopic"
       | "isResident"
       | "manager"
@@ -94,6 +95,10 @@ export interface CondominiumInterface extends Interface {
   encodeFunctionData(
     functionFragment: "counselors",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "editTopic",
+    values: [string, string, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "getTopic", values: [string]): string;
   encodeFunctionData(
@@ -152,6 +157,7 @@ export interface CondominiumInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "counselors", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "editTopic", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getTopic", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isResident", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "manager", data: BytesLike): Result;
@@ -255,6 +261,17 @@ export interface Condominium extends BaseContract {
   closeVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
   counselors: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+
+  editTopic: TypedContractMethod<
+    [
+      topicToEdit: string,
+      description: string,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
   getTopic: TypedContractMethod<
     [title: string],
@@ -375,6 +392,18 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "counselors"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "editTopic"
+  ): TypedContractMethod<
+    [
+      topicToEdit: string,
+      description: string,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "getTopic"
   ): TypedContractMethod<

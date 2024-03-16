@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 library CondominiumLib {
-    enum Status {
+  enum Status {
     IDLE,
     VOTING,
     APPROVED,

@@ -27,6 +27,7 @@ export interface ICondominiumInterface extends Interface {
       | "addResident"
       | "addTopic"
       | "closeVoting"
+      | "editTopic"
       | "openVoting"
       | "removeResident"
       | "removeTopic"
@@ -43,6 +44,10 @@ export interface ICondominiumInterface extends Interface {
     values: [string, string, BigNumberish, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "closeVoting", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "editTopic",
+    values: [string, string, BigNumberish, AddressLike]
+  ): string;
   encodeFunctionData(functionFragment: "openVoting", values: [string]): string;
   encodeFunctionData(
     functionFragment: "removeResident",
@@ -67,6 +72,7 @@ export interface ICondominiumInterface extends Interface {
     functionFragment: "closeVoting",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "editTopic", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "openVoting", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "removeResident",
@@ -146,6 +152,17 @@ export interface ICondominium extends BaseContract {
 
   closeVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
+  editTopic: TypedContractMethod<
+    [
+      topicToEdit: string,
+      description: string,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+
   openVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
 
   removeResident: TypedContractMethod<
@@ -195,6 +212,18 @@ export interface ICondominium extends BaseContract {
   getFunction(
     nameOrSignature: "closeVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "editTopic"
+  ): TypedContractMethod<
+    [
+      topicToEdit: string,
+      description: string,
+      amount: BigNumberish,
+      responsible: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "openVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;

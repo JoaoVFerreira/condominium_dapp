@@ -74,6 +74,13 @@ describe("Condominium", function () {
     expect(result).to.be.equal(RESIDENCE_NUMBER);
   });
 
+  it('Should throw an error when trying to add a resident with invalid address', async () => {
+    const { contract } = await loadFixture(deployFixture);
+    
+    await expect(contract.addResident(ethers.ZeroAddress, RESIDENCE_NUMBER))
+      .to.be.revertedWith('Invalid address');
+  });
+
   it('Should remove a resident with success', async () => {
     const { contract, accounts } = await loadFixture(deployFixture);
     await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
@@ -355,5 +362,17 @@ describe("Condominium", function () {
 
     await expect(contract.closeVoting(TOPIC_TITLE))
       .to.be.revertedWith('You can not finish a voting without reach the minimum votes necessary');
+  });
+
+  it('Should editTopic with success', async () => {
+    const { contract, accounts, manager } = await loadFixture(deployFixture);
+    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER + 1);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.SPENT, ZERO_AMOUNT, manager);
+    await contract.editTopic(TOPIC_TITLE, "new description", 2, accounts[1].address);
+    const result = await contract.getTopic(TOPIC_TITLE);
+
+    expect(result.description).to.equal("new description");
+    expect(result.amount).to.equal(2);
+    expect(result.responsible).to.equal(accounts[1].address);
   });
 });

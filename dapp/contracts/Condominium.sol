@@ -41,6 +41,11 @@ contract Condominium is ICondominium {
     _;
   }
 
+  modifier validAddress (address addr) { 
+    require(addr != address(0), "Invalid address");
+    _;
+  }
+
   function isResident(address resident) public view returns (bool) {
     return residents[resident] > 0;  
   }
@@ -49,7 +54,7 @@ contract Condominium is ICondominium {
     return residences[residence];
   }
 
-  function addResident(address resident, uint16 residenceNumber) external onlyCouncil {
+  function addResident(address resident, uint16 residenceNumber) external onlyCouncil validAddress(resident) {
     require(residenceExists(residenceNumber), "This residence does not exists");
     residents[resident] = residenceNumber;
   }
@@ -59,7 +64,7 @@ contract Condominium is ICondominium {
     delete residents[resident];
   }
 
-  function setCounselor(address resident, bool isEntering) external onlyManager {
+  function setCounselor(address resident, bool isEntering) external onlyManager validAddress(resident) {
     if (isEntering) {
       require(isResident(resident), "The counselor must be a resident");
       counselors[resident] = true;
@@ -193,5 +198,23 @@ contract Condominium is ICondominium {
   function numberOfVotes(string memory title) public view returns (uint256) {
     bytes32 topicId = keccak256(bytes(title));
     return votings[topicId].length;
+  }
+
+  function editTopic(string memory topicToEdit, string memory description, uint amount, address responsible) external onlyManager {
+    Lib.Topic memory topic = getTopic(topicToEdit);
+    require(topic.createdDate > 0, "This topic does not exists");
+    require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be edited");
+
+    bytes32 topicId = keccak256(bytes(topicToEdit));
+
+    if (bytes(description).length > 0) {
+      topics[topicId].description = description;
+    }
+    if (amount >= 0) {
+      topics[topicId].amount = amount;
+    }
+    if (responsible != address(0)) {
+      topics[topicId].responsible = responsible;
+    }
   }
 }

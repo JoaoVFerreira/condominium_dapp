@@ -185,4 +185,68 @@ describe('CondominiumAdapter', () => {
 
     expect(result.status).to.equal(Status.APPROVED);
   });
+
+  it('Should edit topic with success', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
+    await adapter.upgrade(contract.getAddress());
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
+    await adapter.editTopic(TOPIC_TITLE, "new description", ZERO_AMOUNT, ACCOUNT_1)
+    const result = await contract.getTopic(TOPIC_TITLE);
+
+    expect(result.description).to.equal("new description");
+  });
+
+  it('Should throw an error when not upgraded [addTopic]', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
+     
+    await expect(adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [addResident]', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
+     
+    await expect(adapter.addResident(ACCOUNT_1, RESIDENCE_NUMBER))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [editTopic]', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
+     
+    await expect(adapter.editTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, ZERO_AMOUNT, ACCOUNT_1))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [removeTopic]', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+     
+    await expect(adapter.removeTopic(TOPIC_TITLE))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [vote]', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+     
+    await expect(adapter.vote(TOPIC_TITLE, Options.NO))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [closeVoting]', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+     
+    await expect(adapter.closeVoting(TOPIC_TITLE))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [openVoting]', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+     
+    await expect(adapter.openVoting(TOPIC_TITLE))
+      .to.be.revertedWith("You must upgrade first");
+  });
 });
