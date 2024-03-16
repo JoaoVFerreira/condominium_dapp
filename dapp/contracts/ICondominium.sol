@@ -13,4 +13,5 @@ interface ICondominium {
   function setCounselor(address resident, bool isEntering) external;
   function removeResident(address resident) external;
   function addResident(address resident, uint16 residenceNumber) external;
+  function payQuota(uint16 residence) external payable;
 }

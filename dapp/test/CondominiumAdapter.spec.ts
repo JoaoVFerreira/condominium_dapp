@@ -32,6 +32,8 @@ async function addResidents(adapter: CondominiumAdapter, count: number, accounts
   for (let i = 1; i <= count; i++) {
     const residenceId = (1000 * Math.ceil(i / 25)) + (100 * Math.ceil(i / 5)) + (i - (5 * Math.floor((i - 1) / 5)));
     await adapter.addResident(accounts[i - skip].address, residenceId); //1 101
+    const instace = adapter.connect(accounts[i - skip]);
+    await instace.payQuota(residenceId, { value: ethers.parseEther("0.01") });
   }
 }
 
@@ -161,7 +163,7 @@ describe('CondominiumAdapter', () => {
     const { contract } = await loadFixture(deployImplementationFixture);
     const ACCOUNT_1 = await accounts[1].getAddress();
     await adapter.upgrade(contract.getAddress());
-    await adapter.addResident(await accounts[1].getAddress(), RESIDENCE_NUMBER);
+    addResidents(adapter, 1, accounts);
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.openVoting(TOPIC_TITLE);
     const instance = adapter.connect(accounts[1])
@@ -244,6 +246,13 @@ describe('CondominiumAdapter', () => {
   });
 
   it('Should throw an error when not upgraded [openVoting]', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+     
+    await expect(adapter.openVoting(TOPIC_TITLE))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [payQuota]', async () => {
     const { adapter } = await loadFixture(deployAdapterFixture);
      
     await expect(adapter.openVoting(TOPIC_TITLE))

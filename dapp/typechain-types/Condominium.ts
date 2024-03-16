@@ -71,6 +71,8 @@ export interface CondominiumInterface extends Interface {
       | "monthlyQuota"
       | "numberOfVotes"
       | "openVoting"
+      | "payQuota"
+      | "payments"
       | "removeResident"
       | "removeTopic"
       | "residenceExists"
@@ -115,6 +117,14 @@ export interface CondominiumInterface extends Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "openVoting", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "payQuota",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "payments",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "removeResident",
     values: [AddressLike]
@@ -170,6 +180,8 @@ export interface CondominiumInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "openVoting", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "payQuota", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "payments", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "removeResident",
     data: BytesLike
@@ -288,6 +300,10 @@ export interface Condominium extends BaseContract {
   numberOfVotes: TypedContractMethod<[title: string], [bigint], "view">;
 
   openVoting: TypedContractMethod<[title: string], [void], "nonpayable">;
+
+  payQuota: TypedContractMethod<[residence: BigNumberish], [void], "payable">;
+
+  payments: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
   removeResident: TypedContractMethod<
     [resident: AddressLike],
@@ -426,6 +442,12 @@ export interface Condominium extends BaseContract {
   getFunction(
     nameOrSignature: "openVoting"
   ): TypedContractMethod<[title: string], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "payQuota"
+  ): TypedContractMethod<[residence: BigNumberish], [void], "payable">;
+  getFunction(
+    nameOrSignature: "payments"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "removeResident"
   ): TypedContractMethod<[resident: AddressLike], [void], "nonpayable">;

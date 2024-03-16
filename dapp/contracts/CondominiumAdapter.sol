@@ -62,4 +62,8 @@ contract CondominiumAdapter {
   function editTopic(string memory topicToEdit, string memory description, uint amount, address responsible) external upgraded {
     return implementation.editTopic(topicToEdit, description, amount, responsible);
   }
+
+  function payQuota(uint16 residence) external payable upgraded {
+    return implementation.payQuota{value: msg.value}(residence);
+  }
 }

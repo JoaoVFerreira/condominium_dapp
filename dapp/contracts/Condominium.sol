@@ -8,9 +8,11 @@ contract Condominium is ICondominium {
 
   address public manager;
   uint public monthlyQuota = 0.01 ether;
-  mapping (uint16 => bool) public residences;
-  mapping (address => bool) public counselors;
-  mapping (address => uint16) public residents;
+  mapping (uint16 => bool) public residences; // unity => true
+  mapping (address => bool) public counselors; // wallet => true
+  mapping (address => uint16) public residents; // wallet => unity
+
+  mapping(uint16 => uint) public payments; // unity => timestamp
 
   mapping (bytes32 => Lib.Topic) public topics;
   mapping (bytes32 => Lib.Vote[]) public votings;
@@ -38,6 +40,7 @@ contract Condominium is ICondominium {
 
   modifier onlyResidents () { 
     require(tx.origin == manager || isResident(tx.origin), "Only the residents or manager have access to this functionality");
+    require(tx.origin == manager || block.timestamp < payments[residents[tx.origin]] + (30 * 24 * 60 * 60), "The resident must be defaulter");
     _;
   }
 
@@ -216,5 +219,13 @@ contract Condominium is ICondominium {
     if (responsible != address(0)) {
       topics[topicId].responsible = responsible;
     }
+  }
+
+  function payQuota(uint16 residence) external payable {
+    require(residenceExists(residence), "The residence does not exists");
+    require(msg.value >= monthlyQuota, "Wrong value");
+    require(block.timestamp > payments[residence] + (30 * 24 * 60 * 60), "You can not pay twice a month");
+
+    payments[residence] = block.timestamp;
   }
 }

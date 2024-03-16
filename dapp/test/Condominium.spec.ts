@@ -31,6 +31,8 @@ async function addResidents(contract: Condominium, count: number, accounts: Sign
   for (let i = 1; i <= count; i++) {
     const residenceId = (1000 * Math.ceil(i / 25)) + (100 * Math.ceil(i / 5)) + (i - (5 * Math.floor((i - 1) / 5)));
     await contract.addResident(accounts[i - 1].address, residenceId); //1 101
+    const instace = contract.connect(accounts[i - 1]);
+    await instace.payQuota(residenceId, { value: ethers.parseEther("0.01") });
   }
 }
 
@@ -289,11 +291,23 @@ describe("Condominium", function () {
     await contract.openVoting(TOPIC_TITLE);
     await contract.vote(TOPIC_TITLE, Options.YES)
     await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
+    await contract.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.01") });
     const instance = contract.connect(accounts[1]);
     await instance.vote(TOPIC_TITLE, Options.ABSTENTION);
     const result = await instance.numberOfVotes(TOPIC_TITLE);
 
     expect(result).to.be.equal(2);
+  });
+
+  it('Should throw an error when trying to vote with a resident that is not defaulter', async () => {
+    const { contract, accounts } = await loadFixture(deployFixture);
+    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER + 1);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, accounts[1].address);
+    await contract.openVoting(TOPIC_TITLE);
+    const instace = contract.connect(accounts[1]);
+
+    await expect(instace.vote(TOPIC_TITLE, Options.YES))
+      .to.be.revertedWith('The resident must be defaulter');
   });
 
   it('Should closeVoting with success', async () => {
@@ -374,5 +388,27 @@ describe("Condominium", function () {
     expect(result.description).to.equal("new description");
     expect(result.amount).to.equal(2);
     expect(result.responsible).to.equal(accounts[1].address);
+  });
+
+  it('Should throw an error when trying to payQuota with a non existent residence', async () => {
+    const { contract } = await loadFixture(deployFixture);
+
+    await expect(contract.payQuota(1, { value: ethers.parseEther("0.01") }))
+      .to.be.revertedWith("The residence does not exists");
+  });
+
+  it('Should throw an error when trying to payQuota with wrong value', async () => {
+    const { contract } = await loadFixture(deployFixture);
+
+    await expect(contract.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.001") }))
+      .to.be.revertedWith("Wrong value");
+  });
+
+  it('Should throw an error when trying to payQuota twice in a month', async () => {
+    const { contract } = await loadFixture(deployFixture);
+    await contract.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.01") });
+
+    await expect(contract.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.01") }))
+      .to.be.revertedWith("You can not pay twice a month");
   });
 });
