@@ -120,6 +120,8 @@ describe("Condominium", function () {
     const { contract, accounts } = await loadFixture(deployFixture);
     await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
     await contract.setCounselor(accounts[1].address, true);
+    const instance = contract.connect(accounts[1]);
+    await instance.addResident(accounts[2].address, RESIDENCE_NUMBER + 1);
     const result = await contract.counselors(accounts[1].address);
 
     expect(result).to.be.true;
@@ -231,6 +233,15 @@ describe("Condominium", function () {
     expect(result.status).to.be.equal(Status.VOTING);
   });
 
+  it('Should throw an error when open a voting with wrong status', async () => {
+    const { contract, accounts } = await loadFixture(deployFixture);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, accounts[1].address);
+    await contract.openVoting(TOPIC_TITLE);
+
+    await expect(contract.openVoting(TOPIC_TITLE))
+      .to.be.revertedWith('Only IDLE topics can be open for voting');
+  });
+
   it('Should throw an error when trying to open a topic to voting that does not exists', async () => {
     const { contract } = await loadFixture(deployFixture);
 
@@ -272,7 +283,7 @@ describe("Condominium", function () {
     await contract.vote(TOPIC_TITLE, Options.YES)
     await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
     const instance = contract.connect(accounts[1]);
-    await instance.vote(TOPIC_TITLE, Options.YES);
+    await instance.vote(TOPIC_TITLE, Options.ABSTENTION);
     const result = await instance.numberOfVotes(TOPIC_TITLE);
 
     expect(result).to.be.equal(2);
@@ -280,13 +291,69 @@ describe("Condominium", function () {
 
   it('Should closeVoting with success', async () => {
     const { contract, accounts, manager } = await loadFixture(deployFixture);
-    await addResidents(contract, 5, accounts);
+    await addResidents(contract, 6, accounts);
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager.address);
     await contract.openVoting(TOPIC_TITLE);
     await addVotes(contract, 5, accounts);
+    const instance = contract.connect(accounts[5])
+    await instance.vote(TOPIC_TITLE, Options.ABSTENTION);
     await contract.closeVoting(TOPIC_TITLE);
     const result = await contract.getTopic(TOPIC_TITLE);
 
     expect(result.status).to.equal(Status.APPROVED);
+  });
+
+  it('Should throw an error when passing amount to a topic that do not handle money', async () => {
+    const { contract, accounts } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, 10, accounts[1].address)
+      ).to.be.revertedWith('Wrong category');
+  });
+
+  it('Should closeVoting with success [CHANGE_QUOTA]', async () => {
+    const { contract, accounts, manager } = await loadFixture(deployFixture);
+    await addResidents(contract, 20, accounts);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.CHANGE_QUOTA, 5, manager.address);
+    await contract.openVoting(TOPIC_TITLE);
+    await addVotes(contract, 20, accounts);
+    await contract.closeVoting(TOPIC_TITLE);
+    const result = await contract.monthlyQuota();
+
+    expect(result).to.equal(5);
+  });
+
+  it('Should closeVoting with success [CHANGE_MANAGER]', async () => {
+    const { contract, accounts } = await loadFixture(deployFixture);
+    await addResidents(contract, 15, accounts);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.CHANGE_MANAGER, ZERO_AMOUNT, accounts[1].address);
+    await contract.openVoting(TOPIC_TITLE);
+    await addVotes(contract, 15, accounts);
+    await contract.closeVoting(TOPIC_TITLE);
+
+    expect(await contract.manager()).to.equal(accounts[1].address);
+  });
+
+  it('Should closeVoting with success [SPENT]', async () => {
+    const { contract, accounts, manager } = await loadFixture(deployFixture);
+    await addResidents(contract, 10, accounts);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.SPENT, ZERO_AMOUNT, manager);
+    await contract.openVoting(TOPIC_TITLE);
+    await addVotes(contract, 10, accounts, false);
+    await contract.closeVoting(TOPIC_TITLE);
+    const result = await contract.getTopic(TOPIC_TITLE);
+
+    expect(result.status).to.equal(Status.DENIED);
+  });
+
+  it('Should throw an error when does not have minimum votes', async () => {
+    const { contract, accounts, manager } = await loadFixture(deployFixture);
+    await addResidents(contract, 10, accounts);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.CHANGE_QUOTA, 10, manager);
+    await contract.openVoting(TOPIC_TITLE);
+    await addVotes(contract, 10, accounts);
+
+    await expect(contract.closeVoting(TOPIC_TITLE))
+      .to.be.revertedWith('You can not finish a voting without reach the minimum votes necessary');
   });
 });
