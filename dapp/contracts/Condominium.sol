@@ -85,7 +85,12 @@ contract Condominium is ICondominium {
     return getTopic(title).createdDate > 0;
   }
 
-  function addTopic(string memory title, string memory description, Lib.Category category, uint amount, address responsible) external onlyResidents {
+  function addTopic(string memory title,
+    string memory description,
+    Lib.Category category,
+    uint amount,
+    address responsible
+  ) external onlyResidents {
     require(!topicExists(title), "This topic already exists");
     if (amount > 0) {
       require(category == Lib.Category.CHANGE_QUOTA || category == Lib.Category.SPENT, "Wrong category");
@@ -106,15 +111,23 @@ contract Condominium is ICondominium {
     topics[keccak256(bytes(title))] = newTopic;
   }
 
-  function removeTopic(string memory title) external onlyManager {
+  function removeTopic(string memory title) external onlyManager returns (Lib.TopicUpdate memory) {
     Lib.Topic memory topic = getTopic(title);
     require(topic.createdDate > 0, "This topic does not exists");
     require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be removed");
     
-    delete topics[keccak256(bytes(title))];
+    bytes32 topicId = keccak256(bytes(title));
+    delete topics[topicId];
+
+    return Lib.TopicUpdate({
+      topicId: topicId,
+      title: topic.title,
+      status: Lib.Status.DELETED,
+      category: topic.category
+    });
   }
 
-  function openVoting(string memory title) external onlyManager {
+  function openVoting(string memory title) external onlyManager returns (Lib.TopicUpdate memory) {
     Lib.Topic memory topic = getTopic(title);
     require(topic.createdDate > 0, "This topic does not exists");
     require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be open for voting");
@@ -122,9 +135,16 @@ contract Condominium is ICondominium {
     bytes32 topicId = keccak256(bytes(title));
     topics[topicId].status = Lib.Status.VOTING;
     topics[topicId].startDate = block.timestamp;
+
+    return Lib.TopicUpdate({
+      topicId: topicId,
+      title: topic.title,
+      status: Lib.Status.VOTING,
+      category: topic.category
+    });
   }
 
-  function closeVoting(string memory title) external onlyManager {
+  function closeVoting(string memory title) external onlyManager returns (Lib.TopicUpdate memory) {
     Lib.Topic memory topic = getTopic(title);
     require(topic.createdDate > 0, "This topic does not exists");
     require(topic.status == Lib.Status.VOTING, "Only VOTING topics can be closed");
@@ -168,6 +188,13 @@ contract Condominium is ICondominium {
         manager = topic.responsible;
       }
     }
+
+    return Lib.TopicUpdate({
+      topicId: topicId,
+      title: topic.title,
+      status: newStatus,
+      category: topic.category
+    });
   }
 
   function vote(string memory title, Lib.VoteOptions option) external onlyResidents {
@@ -203,7 +230,12 @@ contract Condominium is ICondominium {
     return votings[topicId].length;
   }
 
-  function editTopic(string memory topicToEdit, string memory description, uint amount, address responsible) external onlyManager {
+  function editTopic(
+    string memory topicToEdit,
+    string memory description, 
+    uint amount, 
+    address responsible
+  ) external onlyManager returns (Lib.TopicUpdate memory) {
     Lib.Topic memory topic = getTopic(topicToEdit);
     require(topic.createdDate > 0, "This topic does not exists");
     require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be edited");
@@ -219,6 +251,13 @@ contract Condominium is ICondominium {
     if (responsible != address(0)) {
       topics[topicId].responsible = responsible;
     }
+    
+    return Lib.TopicUpdate({
+      topicId: topicId,
+      title: topic.title,
+      status: topic.status,
+      category: topic.category
+    });
   }
 
   function payQuota(uint16 residence) external payable {
@@ -227,5 +266,32 @@ contract Condominium is ICondominium {
     require(block.timestamp > payments[residence] + (30 * 24 * 60 * 60), "You can not pay twice a month");
 
     payments[residence] = block.timestamp;
+  }
+
+  function transfer(string memory title, uint amount) external onlyManager returns (Lib.TransferReceipt memory) {
+    require(address(this).balance >= amount, "Insufficient funds");
+    Lib.Topic memory topic = getTopic(title);
+
+    require(topic.status == Lib.Status.APPROVED && topic.category == Lib.Category.SPENT, "Only APPROVED SPENT topics can be used for transfers");
+    require(topic.amount>= amount, "The amount must be less or equal the APPROVED topic");
+
+    payable(topic.responsible).transfer(amount);
+
+    bytes32 topicId = keccak256(bytes(title));
+    topics[topicId].status = Lib.Status.SPENT;
+
+    return Lib.TransferReceipt({
+      to: topic.responsible,
+      amount: amount,
+      topic: title
+    });
+  }
+
+  function getManager() external view returns (address) {
+    return manager;
+  }
+
+  function getQuota() external view returns (uint) {
+    return monthlyQuota;
   }
 }

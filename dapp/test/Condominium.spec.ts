@@ -411,4 +411,42 @@ describe("Condominium", function () {
     await expect(contract.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.01") }))
       .to.be.revertedWith("You can not pay twice a month");
   });
+
+  it('Should throw an error when contract funds are insufficient', async () => {
+    const { contract, manager, accounts } = await loadFixture(deployFixture);
+    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER + 1);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.SPENT, ZERO_AMOUNT, manager);
+
+    await expect(contract.transfer(TOPIC_TITLE, 100))
+      .to.be.revertedWith("Insufficient funds");
+  });
+
+  it('Should throw an error when transfer to topic other than spent', async () => {
+    const { contract, manager, accounts } = await loadFixture(deployFixture);
+    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER + 1);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager);
+
+    await expect(contract.transfer(TOPIC_TITLE, 0))
+      .to.be.revertedWith("Only APPROVED SPENT topics can be used for transfers");
+  });
+
+  it('Should throw an error when transfer more than approved in topic', async () => {
+    const { contract, manager, accounts } = await loadFixture(deployFixture);
+    await addResidents(contract, 10, accounts);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.SPENT, 3, manager);
+    await contract.openVoting(TOPIC_TITLE);
+    await addVotes(contract, 10, accounts);
+    await contract.closeVoting(TOPIC_TITLE);
+    await expect(contract.transfer(TOPIC_TITLE, 10))
+      .to.be.revertedWith("The amount must be less or equal the APPROVED topic");
+  });
+
+  it('Should throw an error when transfer is being used for other rather the manager', async () => {
+    const { contract, accounts } = await loadFixture(deployFixture);
+    const instace = contract.connect(accounts[1]);
+
+    await expect(instace.transfer(TOPIC_TITLE, 10))
+      .to.be.revertedWith("Only the manager has access to this functionality");
+  });
 });
+

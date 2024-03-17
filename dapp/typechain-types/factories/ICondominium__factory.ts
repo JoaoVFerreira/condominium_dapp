@@ -66,7 +66,35 @@ const _abi = [
       },
     ],
     name: "closeVoting",
-    outputs: [],
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "topicId",
+            type: "bytes32",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "enum CondominiumLib.Status",
+            name: "status",
+            type: "uint8",
+          },
+          {
+            internalType: "enum CondominiumLib.Category",
+            name: "category",
+            type: "uint8",
+          },
+        ],
+        internalType: "struct CondominiumLib.TopicUpdate",
+        name: "",
+        type: "tuple",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -94,7 +122,61 @@ const _abi = [
       },
     ],
     name: "editTopic",
-    outputs: [],
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "topicId",
+            type: "bytes32",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "enum CondominiumLib.Status",
+            name: "status",
+            type: "uint8",
+          },
+          {
+            internalType: "enum CondominiumLib.Category",
+            name: "category",
+            type: "uint8",
+          },
+        ],
+        internalType: "struct CondominiumLib.TopicUpdate",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getManager",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getQuota",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -107,7 +189,35 @@ const _abi = [
       },
     ],
     name: "openVoting",
-    outputs: [],
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "topicId",
+            type: "bytes32",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "enum CondominiumLib.Status",
+            name: "status",
+            type: "uint8",
+          },
+          {
+            internalType: "enum CondominiumLib.Category",
+            name: "category",
+            type: "uint8",
+          },
+        ],
+        internalType: "struct CondominiumLib.TopicUpdate",
+        name: "",
+        type: "tuple",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -146,7 +256,35 @@ const _abi = [
       },
     ],
     name: "removeTopic",
-    outputs: [],
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "topicId",
+            type: "bytes32",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "enum CondominiumLib.Status",
+            name: "status",
+            type: "uint8",
+          },
+          {
+            internalType: "enum CondominiumLib.Category",
+            name: "category",
+            type: "uint8",
+          },
+        ],
+        internalType: "struct CondominiumLib.TopicUpdate",
+        name: "",
+        type: "tuple",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -165,6 +303,47 @@ const _abi = [
     ],
     name: "setCounselor",
     outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "title",
+        type: "string",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "transfer",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "to",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "topic",
+            type: "string",
+          },
+        ],
+        internalType: "struct CondominiumLib.TransferReceipt",
+        name: "",
+        type: "tuple",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },

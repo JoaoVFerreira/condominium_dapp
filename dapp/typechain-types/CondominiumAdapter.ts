@@ -8,6 +8,7 @@ import type {
   FunctionFragment,
   Result,
   Interface,
+  EventFragment,
   AddressLike,
   ContractRunner,
   ContractMethod,
@@ -17,6 +18,7 @@ import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
+  TypedLogDescription,
   TypedListener,
   TypedContractMethod,
 } from "./common";
@@ -35,9 +37,18 @@ export interface CondominiumAdapterInterface extends Interface {
       | "removeResident"
       | "removeTopic"
       | "setCounselor"
+      | "transfer"
       | "upgrade"
       | "vote"
   ): FunctionFragment;
+
+  getEvent(
+    nameOrSignatureOrTopic:
+      | "ManagerChanged"
+      | "QuotaChanged"
+      | "TopicChanged"
+      | "Transfer"
+  ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "addResident",
@@ -70,6 +81,10 @@ export interface CondominiumAdapterInterface extends Interface {
   encodeFunctionData(
     functionFragment: "setCounselor",
     values: [AddressLike, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transfer",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "upgrade",
@@ -109,8 +124,69 @@ export interface CondominiumAdapterInterface extends Interface {
     functionFragment: "setCounselor",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "upgrade", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
+}
+
+export namespace ManagerChangedEvent {
+  export type InputTuple = [manager: AddressLike];
+  export type OutputTuple = [manager: string];
+  export interface OutputObject {
+    manager: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace QuotaChangedEvent {
+  export type InputTuple = [amount: BigNumberish];
+  export type OutputTuple = [amount: bigint];
+  export interface OutputObject {
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace TopicChangedEvent {
+  export type InputTuple = [
+    topicId: BytesLike,
+    title: string,
+    status: BigNumberish
+  ];
+  export type OutputTuple = [topicId: string, title: string, status: bigint];
+  export interface OutputObject {
+    topicId: string;
+    title: string;
+    status: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace TransferEvent {
+  export type InputTuple = [
+    to: AddressLike,
+    amount: BigNumberish,
+    topic: string
+  ];
+  export type OutputTuple = [to: string, amount: bigint, topic: string];
+  export interface OutputObject {
+    to: string;
+    amount: bigint;
+    topic: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export interface CondominiumAdapter extends BaseContract {
@@ -209,6 +285,12 @@ export interface CondominiumAdapter extends BaseContract {
     "nonpayable"
   >;
 
+  transfer: TypedContractMethod<
+    [title: string, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   upgrade: TypedContractMethod<
     [newImplementation: AddressLike],
     [void],
@@ -286,6 +368,13 @@ export interface CondominiumAdapter extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "transfer"
+  ): TypedContractMethod<
+    [title: string, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "upgrade"
   ): TypedContractMethod<
     [newImplementation: AddressLike],
@@ -300,5 +389,78 @@ export interface CondominiumAdapter extends BaseContract {
     "nonpayable"
   >;
 
-  filters: {};
+  getEvent(
+    key: "ManagerChanged"
+  ): TypedContractEvent<
+    ManagerChangedEvent.InputTuple,
+    ManagerChangedEvent.OutputTuple,
+    ManagerChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "QuotaChanged"
+  ): TypedContractEvent<
+    QuotaChangedEvent.InputTuple,
+    QuotaChangedEvent.OutputTuple,
+    QuotaChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "TopicChanged"
+  ): TypedContractEvent<
+    TopicChangedEvent.InputTuple,
+    TopicChangedEvent.OutputTuple,
+    TopicChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Transfer"
+  ): TypedContractEvent<
+    TransferEvent.InputTuple,
+    TransferEvent.OutputTuple,
+    TransferEvent.OutputObject
+  >;
+
+  filters: {
+    "ManagerChanged(address)": TypedContractEvent<
+      ManagerChangedEvent.InputTuple,
+      ManagerChangedEvent.OutputTuple,
+      ManagerChangedEvent.OutputObject
+    >;
+    ManagerChanged: TypedContractEvent<
+      ManagerChangedEvent.InputTuple,
+      ManagerChangedEvent.OutputTuple,
+      ManagerChangedEvent.OutputObject
+    >;
+
+    "QuotaChanged(uint256)": TypedContractEvent<
+      QuotaChangedEvent.InputTuple,
+      QuotaChangedEvent.OutputTuple,
+      QuotaChangedEvent.OutputObject
+    >;
+    QuotaChanged: TypedContractEvent<
+      QuotaChangedEvent.InputTuple,
+      QuotaChangedEvent.OutputTuple,
+      QuotaChangedEvent.OutputObject
+    >;
+
+    "TopicChanged(bytes32,string,uint8)": TypedContractEvent<
+      TopicChangedEvent.InputTuple,
+      TopicChangedEvent.OutputTuple,
+      TopicChangedEvent.OutputObject
+    >;
+    TopicChanged: TypedContractEvent<
+      TopicChangedEvent.InputTuple,
+      TopicChangedEvent.OutputTuple,
+      TopicChangedEvent.OutputObject
+    >;
+
+    "Transfer(address,uint256,string)": TypedContractEvent<
+      TransferEvent.InputTuple,
+      TransferEvent.OutputTuple,
+      TransferEvent.OutputObject
+    >;
+    Transfer: TypedContractEvent<
+      TransferEvent.InputTuple,
+      TransferEvent.OutputTuple,
+      TransferEvent.OutputObject
+    >;
+  };
 }

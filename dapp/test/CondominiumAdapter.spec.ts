@@ -12,7 +12,9 @@ enum Status {
   IDLE = 0,
   VOTING = 1,
   APPROVED = 2,
-  DENIED = 3
+  DENIED = 3,
+  DELETED = 4,
+  SPENT = 5
 }
 enum Options {
   EMPTY = 0,
@@ -257,5 +259,75 @@ describe('CondominiumAdapter', () => {
      
     await expect(adapter.openVoting(TOPIC_TITLE))
       .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should throw an error when not upgraded [transfer]', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+     
+    await expect(adapter.transfer(TOPIC_TITLE, ethers.parseEther("0.1")))
+      .to.be.revertedWith("You must upgrade first");
+  });
+
+  it('Should transfer with success', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await addResidents(adapter, 10, accounts);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.SPENT, 100, accounts[1].address);
+    await adapter.openVoting(TOPIC_TITLE);
+    await addVotes(adapter, 10, accounts);
+    await adapter.closeVoting(TOPIC_TITLE);
+    const balanceBefore = await ethers.provider.getBalance(await contract.getAddress());
+    const balanceWorkerBefore = await ethers.provider.getBalance(await accounts[1].getAddress());
+    await adapter.transfer(TOPIC_TITLE, 100);
+    const balanceWorkerAfter = await ethers.provider.getBalance(await accounts[1].getAddress());
+    const balanceAfter = await ethers.provider.getBalance(await contract.getAddress());
+    const topic = await contract.getTopic(TOPIC_TITLE);
+
+    expect(balanceAfter).to.equal(balanceBefore - 100n);
+    expect(balanceWorkerAfter).to.equal(balanceWorkerBefore + 100n);
+    expect(topic.status).to.equal(Status.SPENT);
+  });
+
+  it('Should closeVoting with success (CHANGE_MANAGER)', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await addResidents(adapter, 15, accounts);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.CHANGE_MANAGER, ZERO_AMOUNT, accounts[1].address);
+    await adapter.openVoting(TOPIC_TITLE);
+    await addVotes(adapter, 15, accounts);
+    
+    await expect(adapter.closeVoting(TOPIC_TITLE)).to.emit(adapter, "ManagerChanged").withArgs(accounts[1].address);
+  });
+
+  it('Should closeVoting with success (CHANGE_QUOTA)', async () => {
+    const { adapter, accounts, manager } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await addResidents(adapter, 20, accounts);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.CHANGE_QUOTA, 100, manager);
+    await adapter.openVoting(TOPIC_TITLE);
+    await addVotes(adapter, 20, accounts);
+    
+    await expect(adapter.closeVoting(TOPIC_TITLE)).to.emit(adapter, "QuotaChanged").withArgs(100);
+  });
+
+  it('Should closeVoting with success (DENIED)', async () => {
+    const { adapter, accounts, manager } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await addResidents(adapter, 15, accounts);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager);
+    await adapter.openVoting(TOPIC_TITLE);
+    await addVotes(adapter, 15, accounts, true);
+    
+    await expect(adapter.closeVoting(TOPIC_TITLE)).to.emit(adapter, "TopicChanged");
+    const result = await contract.getTopic(TOPIC_TITLE);
+    expect(result.status).to.equal(Status.DENIED);
   });
 });

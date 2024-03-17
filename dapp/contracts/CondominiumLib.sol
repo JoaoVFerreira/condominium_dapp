@@ -6,7 +6,9 @@ library CondominiumLib {
     IDLE,
     VOTING,
     APPROVED,
-    DENIED
+    DENIED,
+    DELETED,
+    SPENT
   }
 
   enum Category {
@@ -40,5 +42,18 @@ library CondominiumLib {
     uint16 residence;
     VoteOptions option;
     uint256 timestamp;
+  }
+
+  struct TopicUpdate {
+    bytes32 topicId;
+    string title;
+    Status status;
+    Category category;
+  }
+
+  struct TransferReceipt {
+    address to;
+    uint amount;
+    string topic;
   }
 }
