@@ -216,9 +216,9 @@ export interface ICondominium extends BaseContract {
     "nonpayable"
   >;
 
-  getManager: TypedContractMethod<[], [string], "nonpayable">;
+  getManager: TypedContractMethod<[], [string], "view">;
 
-  getQuota: TypedContractMethod<[], [bigint], "nonpayable">;
+  getQuota: TypedContractMethod<[], [bigint], "view">;
 
   openVoting: TypedContractMethod<
     [title: string],
@@ -303,10 +303,10 @@ export interface ICondominium extends BaseContract {
   >;
   getFunction(
     nameOrSignature: "getManager"
-  ): TypedContractMethod<[], [string], "nonpayable">;
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "getQuota"
-  ): TypedContractMethod<[], [bigint], "nonpayable">;
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "openVoting"
   ): TypedContractMethod<

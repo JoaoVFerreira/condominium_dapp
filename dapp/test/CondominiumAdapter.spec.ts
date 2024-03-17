@@ -330,4 +330,24 @@ describe('CondominiumAdapter', () => {
     const result = await contract.getTopic(TOPIC_TITLE);
     expect(result.status).to.equal(Status.DENIED);
   });
+
+  it('Should get Manager', async () => {
+    const { adapter, manager } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    const result = await adapter.getManager(); 
+
+    expect(result).to.equal(manager);
+  });
+
+  it('Should get Quota', async () => {
+    const { adapter } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    const result = await adapter.getQuota();
+
+    expect(result).to.equal(ethers.parseEther("0.01"));
+  });
 });

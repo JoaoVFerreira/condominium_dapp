@@ -20,6 +20,6 @@ interface ICondominium {
   function addResident(address resident, uint16 residenceNumber) external;
   function payQuota(uint16 residence) external payable;
   function transfer(string memory title, uint amount) external returns (Lib.TransferReceipt memory);
-  function getManager() external returns (address);
-  function getQuota() external returns (uint);
+  function getManager() external view returns (address);
+  function getQuota() external view returns (uint);
 }

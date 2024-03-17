@@ -98,4 +98,12 @@ contract CondominiumAdapter {
     Lib.TransferReceipt memory receipt = implementation.transfer(title, amount);
     emit Transfer(receipt.to, receipt.amount, receipt.topic);
   }
+
+  function getManager() external view upgraded returns (address) {
+    return implementation.getManager();
+  }
+
+  function getQuota() external view upgraded returns (uint) {
+    return implementation.getQuota();
+  }
 }
