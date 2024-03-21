@@ -2,17 +2,17 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\Condominium.sol": {
-      "lastModificationDate": 1710652875717,
-      "contentHash": "c4ce5a1d49b7f67dc28e5b1c744a9ee4",
+      "lastModificationDate": 1711062914863,
+      "contentHash": "77fe82dee015828014b465b15d9db548",
       "sourceName": "contracts/Condominium.sol",
       "solcConfig": {
         "version": "0.8.24",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
             "enabled": false,
-            "runs": 200
+            "runs": 1000
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -26,6 +26,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -41,17 +44,17 @@
       ]
     },
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\CondominiumLib.sol": {
-      "lastModificationDate": 1710652719851,
-      "contentHash": "3a424de7192b81b0f5e2bb57ef0bff93",
+      "lastModificationDate": 1711061806648,
+      "contentHash": "8aea5b2308b6c875046c1145c7ffcbde",
       "sourceName": "contracts/CondominiumLib.sol",
       "solcConfig": {
         "version": "0.8.24",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
             "enabled": false,
-            "runs": 200
+            "runs": 1000
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -65,6 +68,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -77,17 +83,17 @@
       ]
     },
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\ICondominium.sol": {
-      "lastModificationDate": 1710704493863,
-      "contentHash": "9026f7add3c7d5b10731f0c3d0496dcc",
+      "lastModificationDate": 1711062246413,
+      "contentHash": "ba121c146f951e3a7b9644dafbf19348",
       "sourceName": "contracts/ICondominium.sol",
       "solcConfig": {
         "version": "0.8.24",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
             "enabled": false,
-            "runs": 200
+            "runs": 1000
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -101,6 +107,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -115,17 +124,17 @@
       ]
     },
     "C:\\Users\\joaov\\OneDrive\\Desktop\\web3_condominium\\condominium_dapp\\dapp\\contracts\\CondominiumAdapter.sol": {
-      "lastModificationDate": 1710705045977,
-      "contentHash": "88ab3e7825b7538ffd72e01b6855701b",
+      "lastModificationDate": 1711062292406,
+      "contentHash": "55c435cdd34f0386f7e63eaf017d92cd",
       "sourceName": "contracts/CondominiumAdapter.sol",
       "solcConfig": {
         "version": "0.8.24",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
             "enabled": false,
-            "runs": 200
+            "runs": 1000
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -139,6 +148,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
