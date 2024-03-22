@@ -98,6 +98,8 @@ contract Condominium is ICondominium {
 
   function addResident(address resident, uint16 residenceNumber) external onlyCouncil validAddress(resident) {
     require(residenceExists(residenceNumber), "This residence does not exists");
+    require(!isResident(resident), "This resident already exists");
+
     residents.push(Lib.Resident({
       wallet: resident,
       residence: residenceNumber,
@@ -144,7 +146,7 @@ contract Condominium is ICondominium {
       counselors[index] = latest;
     }
     counselors.pop();
-    residents[_residentIndex[counselor]].isCounselor = true;
+    residents[_residentIndex[counselor]].isCounselor = false;
   }
 
   function setCounselor(address resident, bool isEntering) external onlyManager validAddress(resident) {
@@ -318,7 +320,10 @@ contract Condominium is ICondominium {
     require(topic.createdDate > 0, "This topic does not exists");
     require(topic.status == Lib.Status.VOTING, "Only VOTING topics can be voted");
 
-    uint16 residence = residents[_residentIndex[tx.origin]].residence;
+    uint index = _residentIndex[tx.origin];
+    require(index > 0 || residents[0].wallet == tx.origin, "Resident not found");
+
+    uint16 residence = residents[index].residence;
     bytes32 topicId = keccak256(bytes(title));
 
     Lib.Vote[] memory votes = _votings[topicId];

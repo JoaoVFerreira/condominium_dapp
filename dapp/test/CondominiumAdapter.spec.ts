@@ -106,7 +106,7 @@ describe('CondominiumAdapter', () => {
   it('Should remove a resident with success', async () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
-    await adapter.upgrade(contract.getAddress());
+    await adapter.upgrade(await contract.getAddress());
     await adapter.addResident(accounts[1].address, RESIDENCE_NUMBER)
     await adapter.removeResident(accounts[1].address)
     const result = await contract.isResident(accounts[1].address);
@@ -117,19 +117,20 @@ describe('CondominiumAdapter', () => {
   it('Should set counselor with success', async () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
-    await adapter.upgrade(contract.getAddress());
-    await adapter.addResident(accounts[1].address, RESIDENCE_NUMBER)
-    await adapter.setCounselor(accounts[1].address, true)
-    const result = await contract.counselors(accounts[1].address);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await adapter.addResident(accounts[1].address, 1301);
+    await adapter.setCounselor(accounts[1].address, true);
+    const resident = await adapter.getResident(accounts[1].address);
 
-    expect(result).to.equal(true);
+    expect(resident.isCounselor).to.equal(true);
   });
 
   it('Should add topic with success', async () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
     const ACCOUNT_1 = await accounts[1].getAddress();
-    await adapter.upgrade(contract.getAddress());
+    await adapter.upgrade(await contract.getAddress());
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     const result = await contract.topicExists(TOPIC_TITLE);
 
@@ -140,7 +141,7 @@ describe('CondominiumAdapter', () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
     const ACCOUNT_1 = await accounts[1].getAddress();
-    await adapter.upgrade(contract.getAddress());
+    await adapter.upgrade(await contract.getAddress());
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.removeTopic(TOPIC_TITLE);
     const result = await contract.topicExists(TOPIC_TITLE);
@@ -152,7 +153,7 @@ describe('CondominiumAdapter', () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
     const ACCOUNT_1 = await accounts[1].getAddress();
-    await adapter.upgrade(contract.getAddress());
+    await adapter.upgrade(await contract.getAddress());
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.openVoting(TOPIC_TITLE);
     const result = await contract.getTopic(TOPIC_TITLE);
@@ -164,7 +165,7 @@ describe('CondominiumAdapter', () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
     const ACCOUNT_1 = await accounts[1].getAddress();
-    await adapter.upgrade(contract.getAddress());
+    await adapter.upgrade(await contract.getAddress());
     addResidents(adapter, 1, accounts);
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.openVoting(TOPIC_TITLE);
@@ -194,7 +195,7 @@ describe('CondominiumAdapter', () => {
     const { adapter, accounts } = await loadFixture(deployAdapterFixture);
     const { contract } = await loadFixture(deployImplementationFixture);
     const ACCOUNT_1 = await accounts[1].getAddress();
-    await adapter.upgrade(contract.getAddress());
+    await adapter.upgrade(await contract.getAddress());
     await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
     await adapter.editTopic(TOPIC_TITLE, "new description", ZERO_AMOUNT, ACCOUNT_1)
     const result = await contract.getTopic(TOPIC_TITLE);
@@ -349,5 +350,74 @@ describe('CondominiumAdapter', () => {
     const result = await adapter.getQuota();
 
     expect(result).to.equal(ethers.parseEther("0.01"));
+  });
+
+  it('Should get Topic with success', async () => {
+    const { adapter, manager } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager);
+    const result = await adapter.getTopic(TOPIC_TITLE);
+    
+    expect(result[0]).to.equal(TOPIC_TITLE);
+    expect(result[result.length - 1 ]).to.equal(manager.address);
+  });
+
+  it('Should get topic(S) with success', async () => {
+    const { adapter, manager } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await adapter.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager);
+    await adapter.addTopic('TITLE', 'DESCPRITION', Category.DECISION, ZERO_AMOUNT, manager);
+    await adapter.addTopic('PAY EMPLOYEE','PAY EMPLOYEE DESCPRITION' , Category.SPENT, ethers.parseEther("0.1"), manager);
+    const result = await adapter.getTopics(1, 5);
+    const firstTopic = result.topics.some((topic) => topic.title === TOPIC_TITLE);
+    const secondTopic = result.topics.some((topic) => topic.title === 'TITLE');
+    const thirdTopic = result.topics.some((topic) => topic.title === 'PAY EMPLOYEE');
+
+    expect(result.total).to.equal(3);
+    expect(firstTopic).to.be.true;
+    expect(secondTopic).to.be.true;
+    expect(thirdTopic).to.be.true;
+  });
+
+  it('Should get resident(S) with success', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const address = await contract.getAddress();
+    await adapter.upgrade(address);
+    await adapter.addResident(accounts[1].address, RESIDENCE_NUMBER);
+    await adapter.addResident(accounts[2].address, RESIDENCE_NUMBER + 1);
+    await adapter.addResident(accounts[3].address, RESIDENCE_NUMBER + 2);
+    const result = await adapter.getResidents(1, 10);
+    
+    expect(result.total).to.equal(3);
+  });
+
+  it('Should get vote(S) with success', async () => {
+    const { adapter, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+    const ACCOUNT_1 = await accounts[1].getAddress();
+    await adapter.upgrade(await contract.getAddress());
+    await adapter.addResident(accounts[1].address, RESIDENCE_NUMBER);
+    await adapter.addResident(accounts[2].address, RESIDENCE_NUMBER + 1);
+    await adapter.addResident(accounts[3].address, RESIDENCE_NUMBER + 2);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, ACCOUNT_1);
+    await adapter.openVoting(TOPIC_TITLE);
+    const instance = adapter.connect(accounts[1])
+    await instance.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.01") });
+    await instance.vote(TOPIC_TITLE, Options.YES);
+    const instance2 = adapter.connect(accounts[2])
+    await instance2.payQuota(RESIDENCE_NUMBER + 1, { value: ethers.parseEther("0.01") });
+    await instance2.vote(TOPIC_TITLE, Options.YES);
+    const instance3 = adapter.connect(accounts[3])
+    await instance3.payQuota(RESIDENCE_NUMBER + 2, { value: ethers.parseEther("0.01") });
+    await instance3.vote(TOPIC_TITLE, Options.YES);
+    const result = await adapter.getVotes(TOPIC_TITLE);
+    
+    expect(result[0].resident).to.equal(ACCOUNT_1);
+    expect(result[0].option).to.equal(Options.YES);
   });
 });

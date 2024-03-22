@@ -71,9 +71,9 @@ describe("Condominium", function () {
   it('Should add a resident with success', async () => {
     const { contract, accounts } = await loadFixture(deployFixture);
     await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
-    const result = await contract.residents(accounts[1].address);
+    const result = await contract.isResident(accounts[1].address);
     
-    expect(result).to.be.equal(RESIDENCE_NUMBER);
+    expect(result).to.equal(true);
   });
 
   it('Should throw an error when trying to add a resident with invalid address', async () => {
@@ -127,13 +127,14 @@ describe("Condominium", function () {
 
   it('Should set a counselor with success', async () => {
     const { contract, accounts } = await loadFixture(deployFixture);
-    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
+    await contract.addResident(accounts[1].address, 2102);
     await contract.setCounselor(accounts[1].address, true);
     const instance = contract.connect(accounts[1]);
-    await instance.addResident(accounts[2].address, RESIDENCE_NUMBER + 1);
-    const result = await contract.counselors(accounts[1].address);
+    await instance.addResident(accounts[2].address, 1302);
+    const resident = await contract.getResident(accounts[1].address);
 
-    expect(result).to.be.true;
+    expect(resident.isCounselor).to.equal(true);
+    expect(await contract.isResident(accounts[2].address)).to.equal(true);
   });
 
   it('Should throw an error when trying to set a counselor that is not a resident', async () => {
@@ -145,14 +146,12 @@ describe("Condominium", function () {
 
   it('Should delete a counselor with success', async () => {
     const { contract, accounts } = await loadFixture(deployFixture);
-    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
+    await contract.addResident(accounts[1].address, 2102);
     await contract.setCounselor(accounts[1].address, true);
-    const counselor = await contract.counselors(accounts[1].address);
     await contract.setCounselor(accounts[1].address, false);
-    const counselorRemoved = await contract.counselors(accounts[1].address);
+    const resident = await contract.getResident(accounts[1].address);
 
-    expect(counselor).to.be.true;
-    expect(counselorRemoved).to.equal(false);
+    expect(resident.isCounselor).to.equal(false);
   });
 
   it('Should add a topic with success', async () => {
@@ -276,27 +275,26 @@ describe("Condominium", function () {
   });
 
   it('Should throw an error when trying to vote twice', async () => {
-    const { contract, accounts } = await loadFixture(deployFixture);
-    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, accounts[1].address);
+    const { contract, accounts, manager } = await loadFixture(deployFixture);
+    await addResidents(contract, 1, [accounts[1]]);
+    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, manager.address);
     await contract.openVoting(TOPIC_TITLE);
-    await contract.vote(TOPIC_TITLE, Options.YES)
+    const instance = contract.connect(accounts[1]);
+    await instance.vote(TOPIC_TITLE, Options.ABSTENTION);
 
-    await expect(contract.vote(TOPIC_TITLE, Options.YES))
+    await expect(instance.vote(TOPIC_TITLE, Options.YES))
       .to.be.revertedWith('A residence should vote only once');
   });
 
   it('Should vote with success', async () => {
-    const { contract, accounts } = await loadFixture(deployFixture);
-    await contract.addTopic(TOPIC_TITLE, TOPIC_DESCRIPTION, Category.DECISION, ZERO_AMOUNT, accounts[1].address);
-    await contract.openVoting(TOPIC_TITLE);
-    await contract.vote(TOPIC_TITLE, Options.YES)
-    await contract.addResident(accounts[1].address, RESIDENCE_NUMBER);
-    await contract.payQuota(RESIDENCE_NUMBER, { value: ethers.parseEther("0.01") });
+    const { contract, manager ,accounts } = await loadFixture(deployFixture);
+    await addResidents(contract, 1, [accounts[1]]);
+    await contract.addTopic("topic 1", "description 1", Category.DECISION, 0, manager.address);
+    await contract.openVoting("topic 1");
     const instance = contract.connect(accounts[1]);
-    await instance.vote(TOPIC_TITLE, Options.ABSTENTION);
-    const result = await instance.numberOfVotes(TOPIC_TITLE);
+    await instance.vote("topic 1", Options.ABSTENTION);
 
-    expect(result).to.be.equal(2);
+    expect(await instance.numberOfVotes("topic 1")).to.equal(1);
   });
 
   it('Should throw an error when trying to vote with a resident that is not defaulter', async () => {
