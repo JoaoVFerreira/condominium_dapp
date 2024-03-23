@@ -1,7 +1,12 @@
+import Sidebar from '../components/Sidebar';
+
 export default function Transfer() {
   return (
-    <div>
-      <h1>Transfererencias</h1>
-    </div>
+    <>
+      <Sidebar />
+      <div>
+        <h1>Transfererencias</h1>
+      </div>
+    </>
   )
 }

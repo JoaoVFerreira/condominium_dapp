@@ -2,6 +2,7 @@ import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Topics from './pages/Topics';
 import Transfer from './pages/Transfer';
+import Settings from './pages/Settings';
 import { Profile, doLogout } from './services/Web3Service';
 
 function Router() {
@@ -26,18 +27,47 @@ function Router() {
     }
   }
 
+  function CouncilRoute({ children }: Props) {
+    const isAuth = !!localStorage.getItem("account");
+    const isResident = Number(localStorage.getItem('profile') ?? Profile.RESIDENT) === Profile.RESIDENT;
+
+    if (isAuth && !isResident) {
+      return children;
+    } else {
+      doLogout();
+      return <Navigate to="/"/>;
+    }
+  }
+
+  function ResidentRoute({ children }: Props) {
+    const isAuth = !!localStorage.getItem("account");
+    const isResident = Number(localStorage.getItem('profile') ?? Profile.RESIDENT) === Profile.RESIDENT;
+
+    if (isAuth && isResident) {
+      return children;
+    } else {
+      doLogout();
+      return <Navigate to="/"/>;
+    }
+  }
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Login/>} />
         <Route path='/topics' element={
           <PrivateRoute>
-              <Topics/>
+            <Topics/>
           </PrivateRoute>
         } />
         <Route path='/transfer' element={
           <ManagerRoute>
-              <Transfer/>
+            <Transfer/>
+          </ManagerRoute>
+        } />
+        <Route path='/settings' element={
+          <ManagerRoute>
+            <Settings/>
           </ManagerRoute>
         } />
       </Routes>
