@@ -34,8 +34,8 @@ async function addResidents(adapter: CondominiumAdapter, count: number, accounts
   for (let i = 1; i <= count; i++) {
     const residenceId = (1000 * Math.ceil(i / 25)) + (100 * Math.ceil(i / 5)) + (i - (5 * Math.floor((i - 1) / 5)));
     await adapter.addResident(accounts[i - skip].address, residenceId); //1 101
-    const instace = adapter.connect(accounts[i - skip]);
-    await instace.payQuota(residenceId, { value: ethers.parseEther("0.01") });
+    const instance = adapter.connect(accounts[i - skip]);
+    await instance.payQuota(residenceId, { value: ethers.parseEther("0.01") });
   }
 }
 

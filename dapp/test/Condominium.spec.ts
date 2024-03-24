@@ -31,8 +31,8 @@ async function addResidents(contract: Condominium, count: number, accounts: Sign
   for (let i = 1; i <= count; i++) {
     const residenceId = (1000 * Math.ceil(i / 25)) + (100 * Math.ceil(i / 5)) + (i - (5 * Math.floor((i - 1) / 5)));
     await contract.addResident(accounts[i - 1].address, residenceId); //1 101
-    const instace = contract.connect(accounts[i - 1]);
-    await instace.payQuota(residenceId, { value: ethers.parseEther("0.01") });
+    const instance = contract.connect(accounts[i - 1]);
+    await instance.payQuota(residenceId, { value: ethers.parseEther("0.01") });
   }
 }
 
