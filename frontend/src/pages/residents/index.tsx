@@ -6,6 +6,8 @@ import Loader from "../../components/Loader";
 import Sidebar from "../../components/Sidebar";
 import ResidentRow from "./ResidentRow";
 import { Resident, getResidents, removeResident } from "../../services/Web3Service";
+import Pagination from "../../components/Pagination";
+import { ethers } from "ethers";
 
 export default function Residents() {
   const navigate = useNavigate();
@@ -18,12 +20,14 @@ export default function Residents() {
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>(""); 
   const [isLoading, setIsLoanding] = useState<boolean>(false);
+  const [count, setCount] = useState<ethers.BigNumberish>(0 as ethers.BigNumberish);
   
   useEffect(() => {
     setIsLoanding(true);
 
     getResidents(parseInt(query.get("page") ?? "1")).then((result) => {
       setResidents(result.residents);
+      setCount(result.total);
       setIsLoanding(false);
     }).catch((err: any) => {
       setIsLoanding(false);
@@ -98,8 +102,9 @@ export default function Residents() {
                           }
                         </tbody>
                       </table>
+                      <Pagination count={count} pageSize={10}/>
                     </div>
-                    <div className="row ms-3">
+                    <div className="row ms-2">
                       <div className="col-md-12 mb-3">
                         <a className="btn bg-gradient-dark me-2" href="/residents/new">
                           <i className="material-icons opacity-10 me-2">add</i>
