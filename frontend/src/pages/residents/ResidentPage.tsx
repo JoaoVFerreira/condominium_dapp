@@ -1,11 +1,32 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
-import { useState, useEffect } from 'react';
+import SwitchInput from "../../components/SwitchInput";
+import { Resident, addResident, isManager } from '../../services/Web3Service';
 
 export default function ResidentPage() {
 
+  const navigate = useNavigate();
   const [isLoading, setIsLoanding] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const [resident, setResident] = useState<Resident>({} as Resident);
+
+  function onResidentChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    setResident(prevState => ({...prevState, [ev.target.id]: ev.target.value }));
+  }
+
+  async function btnSaveClick() {
+    if (resident) {
+      setMessage("Connecting to wallet...wait..");
+      try {
+        const newResident = await addResident(resident.wallet, resident.residence);
+        navigate(`/residents?tx=${newResident?.hash}`)
+      } catch (err: any) {
+        setMessage(err.message);
+      }
+    }
+  } 
 
   return (
     <>
@@ -41,7 +62,7 @@ export default function ResidentPage() {
                     <div className="form-group">
                       <label htmlFor="wallet">Wallet Address:</label>
                         <div className="input-group input-group-outline">
-                          <input className="form-control" type="text" id="wallet" value="" placeholder="0x000..."/>
+                          <input className="form-control" type="text" id="wallet" value={resident.wallet} placeholder="0x000..." onChange={onResidentChange}/>
                         </div>
                     </div>
                   </div>
@@ -51,14 +72,25 @@ export default function ResidentPage() {
                     <div className="form-group">
                       <label htmlFor="residence">Residence Number:</label>
                       <div className="input-group input-group-outline">
-                        <input className="form-control" type="number" id="residence" value="" placeholder="1101" />
+                        <input className="form-control" type="number" id="residence" value={resident.residence} placeholder="1101" onChange={onResidentChange}/>
                       </div>
                     </div>
                   </div>
                 </div>
+                {
+                  isManager() ? (
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                        <SwitchInput id="isCouncelor" text="is Counselor ?" isChecked={resident.isCounselor}  onChange={onResidentChange} />
+                        </div>
+                      </div>
+                    </div>
+                  ) : <></>
+                }
                 <div className="row ms-3">
                   <div className="col-md-12 mb-3">
-                    <button className="btn bg-gradient-dark me-2">
+                    <button className="btn bg-gradient-dark me-2" onClick={btnSaveClick}>
                       <i className="material-icons opacity-10 me-2">save</i>
                       Save Settings
                     </button>

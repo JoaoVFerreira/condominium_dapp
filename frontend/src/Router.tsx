@@ -74,12 +74,12 @@ function Router() {
         } />
         <Route path='/residents/new' element={
           <CouncilRoute>
-            <Residents/>
+            <ResidentPage/>
           </CouncilRoute>
         } />
         <Route path='/residents' element={
           <CouncilRoute>
-            <ResidentPage/>
+            <Residents/>
           </CouncilRoute>
         } />
       </Routes>
