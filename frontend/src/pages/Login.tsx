@@ -8,6 +8,7 @@ function Login() {
   
   async function btnLoginClick() {
     try {
+      setMessage("Logging in...");
       await doLogin();
       navigate('/topics');
     } catch (err: any) {

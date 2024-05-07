@@ -6,6 +6,7 @@ import Loader from "../../components/Loader";
 import Sidebar from "../../components/Sidebar";
 import ResidentRow from "./ResidentRow";
 import { Resident, getResidents, removeResident } from "../../services/Web3Service";
+import { deleteApiResident } from '../../services/ApiService';
 import Pagination from "../../components/Pagination";
 import { ethers } from "ethers";
 
@@ -19,18 +20,18 @@ export default function Residents() {
   const [residents, setResidents] = useState<Resident[]>([]);
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>(""); 
-  const [isLoading, setIsLoanding] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [count, setCount] = useState<ethers.BigNumberish>(0 as ethers.BigNumberish);
   
   useEffect(() => {
-    setIsLoanding(true);
+    setIsLoading(true);
 
     getResidents(parseInt(query.get("page") ?? "1")).then((result) => {
       setResidents(result.residents);
       setCount(result.total);
-      setIsLoanding(false);
+      setIsLoading(false);
     }).catch((err: any) => {
-      setIsLoanding(false);
+      setIsLoading(false);
       console.log(err);
       setError(err.message);
     });
@@ -42,16 +43,22 @@ export default function Residents() {
   }, []);
 
   function onDeleteResident(wallet: string) {
-    setIsLoanding(true);
+    setIsLoading(true);
     setMessage("");
     setError("");
-    removeResident(wallet).then((tx) => {
-      navigate(`/residents?tx=${tx.hash}`)
-    }).catch((err: any) => {
-      setIsLoanding(false);
-      setError(err.message);
-    })
+    const promiseBlockchain = removeResident(wallet);
+    const promiseBackend = deleteApiResident(wallet);
+  
+    Promise.all([promiseBlockchain, promiseBackend])
+      .then(tx => {
+        navigate("/residents?tx=" + tx[0].hash);
+      })
+      .catch(err => {
+        setIsLoading(false);
+        setError(err.message);
+      });
   }
+  
 
   return (
     <>

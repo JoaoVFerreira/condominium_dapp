@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { Resident, isManager } from "../../services/Web3Service";
+import { Resident, hasManagerPermissions } from "../../services/Web3Service";
 
 type Props = {
   data: Resident;
@@ -49,7 +49,7 @@ export default function ResidentRow ({ data, onDelete }: Props) {
       </td>
       <td>
         {
-          isManager() ? (
+          hasManagerPermissions() ? (
             <>
               <a href={`/residents/edit/${data.wallet}`} className="btn btn-info btn-sm me-1">
                 <i className="material-icons text-sm">edit</i>
