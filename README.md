@@ -39,10 +39,10 @@ This project is a Decentralized Autonomous Organization (DAO) aimed at reducing 
 ## Demo
 
 **Manager POV**
-<img src="frontend/public/POV_manager.mp4">
+<img src="frontend/public/POV_manager.gif">
 
 **Resident POV**
-<img src="frontend/public/POV_resident.mp4">
+<img src="frontend/public/POV_resident.gif">
 
 ## How to use
 
