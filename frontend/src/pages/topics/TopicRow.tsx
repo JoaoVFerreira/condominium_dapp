@@ -37,7 +37,7 @@ function TopicRow(props: Props) {
 
   function getStatus() {
     let text = "", className = "";
-    switch (props.data.status) {
+    switch (Number(props.data.status)) {
       case Status.APPROVED: {
         text = "Approved";
         className = "badge bg-success py-1 ms-3";
@@ -95,7 +95,7 @@ function TopicRow(props: Props) {
           <i className="material-icons text-sm">visibility</i>
         </a>
         {
-          hasManagerPermissions() && props.data.status === Status.IDLE
+          hasManagerPermissions() && Number(props.data.status) === Status.IDLE
             ? (
               <a href="#" className="btn btn-danger btn-sm me-1" onClick={btnDeleteClick}>
                 <i className="material-icons text-sm">delete</i>

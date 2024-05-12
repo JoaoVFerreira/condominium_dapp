@@ -10,14 +10,13 @@ type Props = {
 }
 
 function TopicFiles(props: Props) {
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<string[]>([]);
   const [newFile, setNewFile] = useState<File>();
   const [uploadMessage, setUploadMessage] = useState<string>("");
 
   function onDeleteTopic(filename: string) {
-    if (props.status !== Status.IDLE) return setUploadMessage(`You cannot delete this file.`);
+    if (Number(props.status) !== Status.IDLE) return setUploadMessage(`You cannot delete this file.`);
 
     setIsLoading(true);
     setUploadMessage("Deleting the file...wait...");
@@ -88,11 +87,11 @@ function TopicFiles(props: Props) {
             </div>
           </div>
           <div className="card-body px-0 pb-2">
-            {
+              {
               isLoading
                 ? <Loader />
                 : <></>
-            }
+              }
             <div className="table-responsive p-0">
               <table className="table align-items-center mb-0">
                 <thead>
@@ -120,7 +119,7 @@ function TopicFiles(props: Props) {
               <hr />
             </div>
             {
-              props.status === Status.IDLE
+              Number(props.status) === Status.IDLE
                 ? (
                   <div className="row mb-3 ms-3">
                     <div className="col-md-6 mb-3">

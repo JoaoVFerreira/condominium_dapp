@@ -31,7 +31,7 @@ function TopicFileRow(props: Props) {
           <i className="material-icons text-sm">cloud_download</i>
         </a>
         {
-          hasManagerPermissions() && props.status === Status.IDLE
+          hasManagerPermissions() && Number(props.status) === Status.IDLE
             ? (
               <a href="#" className="btn btn-danger btn-sm me-1 mb-0" onClick={btnDeleteClick}>
                 <i className="material-icons text-sm">delete</i>

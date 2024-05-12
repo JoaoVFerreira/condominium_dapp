@@ -44,20 +44,20 @@ function Quota() {
   }
 
   function getDate(timestamp: ethers.BigNumberish): string {
-    const timestampMs = ethers.toNumber(timestamp) * 1000;
+    const timestampMs = ethers.toNumber(timestamp ?? 0) * 1000;
     if (!timestampMs) return "Never Paid";
     return new Date(timestampMs).toDateString();
   }
 
   function getNextPaymentClass() {
     let className = "input-group input-group-outline";
-    const dateMs = ethers.toNumber(resident.nextPayment) * 1000;
+    const dateMs = ethers.toNumber(resident.nextPayment ?? 0) * 1000;
     if (!dateMs || dateMs < Date.now()) return className + " is-invalid";
     return className + " is-valid";
   }
 
   function shouldPay(): boolean {
-    return (ethers.toNumber(resident.nextPayment) * 1000) <= Date.now();
+    return (ethers.toNumber(resident.nextPayment ?? 0) * 1000) <= Date.now();
   }
 
   return (

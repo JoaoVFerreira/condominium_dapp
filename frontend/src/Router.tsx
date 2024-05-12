@@ -44,7 +44,7 @@ function Router() {
 
   function ResidentRoute({ children }: Props) {
     const isAuth = !!localStorage.getItem("account");
-    const isResident = Number(localStorage.getItem('profile') ?? Profile.RESIDENT) === Profile.RESIDENT;
+    const isResident = parseInt(localStorage.getItem("profile") || "0") === Profile.RESIDENT;
 
     if (isAuth && isResident) {
       return children;

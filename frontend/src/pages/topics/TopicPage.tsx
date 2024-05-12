@@ -36,12 +36,15 @@ function TopicPage() {
   useEffect(() => {
     if (title) {
       setIsLoading(true);
-
+  
       getTopic(title)
         .then((topic) => {
           setTopic(topic);
-          if (![Status.DELETED, Status.IDLE].includes(topic.status || Status.DELETED)) return getVotes(topic.title);
-          else setIsLoading(false);
+          if (![Status.DELETED, Status.IDLE].includes(Number(topic.status) || Status.DELETED)) {
+            return getVotes(topic.title);
+          } else {
+            setIsLoading(false);
+          }
         })
         .then((votes) => {
           setVotes(votes || []);
@@ -51,13 +54,15 @@ function TopicPage() {
           setMessage(err.message);
           setIsLoading(false);
         });
-    } else topic.responsible = localStorage.getItem("account") || "";
+    } else {
+      topic.responsible = localStorage.getItem("account") || "";
+    }
   }, [title]);
-
+  
   function onTopicChange(evt: React.ChangeEvent<HTMLInputElement>) {
     setTopic((prevState) => ({ ...prevState, [evt.target.id]: evt.target.value }));
   }
-
+  
   function btnSaveClick() {
     if (topic) {
       setMessage("Saving...wait...");
@@ -72,13 +77,15 @@ function TopicPage() {
       }
     }
   }
-
+  
   function getDate(timestamp: ethers.BigNumberish) {
     const dateMs = ethers.toNumber(timestamp) * 1000;
-    if (!dateMs) return "";
+    if (!dateMs) {
+      return "";
+    }
     return new Date(dateMs).toDateString();
   }
-
+  
   function getStatus(): string {
     switch (topic.status) {
       case Status.APPROVED:
@@ -95,30 +102,30 @@ function TopicPage() {
         return "IDLE";
     }
   }
-
+  
   function showResponsible(): boolean {
     const category = parseInt(`${topic.category}`);
     return [Category.SPENT, Category.CHANGE_MANAGER].includes(category);
   }
-
+  
   function showAmount(): boolean {
     const category = parseInt(`${topic.category}`);
     return [Category.SPENT, Category.CHANGE_QUOTA].includes(category);
   }
-
+  
   function isClosed(): boolean {
     const status = parseInt(`${topic.status || 0}`);
     return [Status.APPROVED, Status.DENIED, Status.DELETED, Status.SPENT].includes(status);
   }
-
+  
   function getAmount(): string {
     return topic.amount ? topic.amount.toString() : "0";
   }
-
+  
   function isDisabled() {
-    return !!title && (topic.status !== Status.IDLE || !hasManagerPermissions());
+    return !!title && (Number(topic.status) !== Status.IDLE || !hasManagerPermissions());
   }
-
+  
   function btnOpenVoteClick() {
     if (topic && title) {
       setMessage(`Connecting to MetaMask...wait...`);
@@ -127,7 +134,7 @@ function TopicPage() {
         .catch((err) => setMessage(err.message));
     }
   }
-
+  
   function btnCloseVoteClick() {
     if (topic && title) {
       setMessage(`Connecting to MetaMask...wait...`);
@@ -136,18 +143,18 @@ function TopicPage() {
         .catch((err) => setMessage(err.message));
     }
   }
-
+  
   function showVoting() {
-    return ![Status.DELETED, Status.IDLE].includes(topic.status || Status.DELETED) && votes && votes.length;
+    return ![Status.DELETED, Status.IDLE].includes(Number(topic.status) || Status.DELETED) && votes && votes.length;
   }
-
+  
   function alreadyVoted() {
     return votes && votes.length && votes.find((v) => v.resident.toUpperCase() === (localStorage.getItem("account") || "").toUpperCase());
   }
-
+  
   function btnVoteClick(option: Options) {
     setMessage("Connecting to MetaMask...wait...");
-    if (topic && topic.status === Status.VOTING && title) {
+    if (topic && Number(topic.status) === Status.VOTING && title) {
       let text = "";
       switch (option) {
         case Options.YES:
@@ -159,26 +166,30 @@ function TopicPage() {
         default:
           text = "ABSTENTION";
       }
-
+  
       if (window.confirm(`Are you sure to vote as ${text}?`)) {
         vote(title, option)
           .then((tx) => navigate("/topics?tx=" + tx.hash))
           .catch((err) => setMessage(err.message));
-      } else setMessage("");
+      } else {
+        setMessage("");
+      }
     }
   }
-
+  
   function btnTransferClick() {
     setMessage("Connecting to MetaMask...wait...");
-    if (topic && topic.status === Status.APPROVED && title) {
+    if (topic && Number(topic.status) === Status.APPROVED && title) {
       if (window.confirm(`Are you sure to transfer ETH ${ethers.formatEther(topic.amount)} for ${topic.responsible}?`)) {
         transfer(title, topic.amount)
           .then((tx) => navigate("/topics?tx=" + tx.hash))
           .catch((err) => setMessage(err.message));
-      } else setMessage("");
+      } else {
+        setMessage("");
+      }
     }
   }
-
+  
   return (
     <>
       <Sidebar />
@@ -335,7 +346,7 @@ function TopicPage() {
                       ) : (
                         <></>
                       )}
-                      {hasManagerPermissions() && topic.status === Status.IDLE ? (
+                      {hasManagerPermissions() && Number(topic.status) === Status.IDLE ? (
                         <button className="btn btn-success me-2" onClick={btnOpenVoteClick}>
                           <i className="material-icons opacity-10 me-2">lock_open</i>
                           Open Voting
@@ -343,7 +354,7 @@ function TopicPage() {
                       ) : (
                         <></>
                       )}
-                      {hasManagerPermissions() && topic.status === Status.VOTING ? (
+                      {hasManagerPermissions() && Number(topic.status) === Status.VOTING ? (
                         <button className="btn btn-danger me-2" onClick={btnCloseVoteClick}>
                           <i className="material-icons opacity-10 me-2">lock</i>
                           Close Voting
@@ -351,7 +362,7 @@ function TopicPage() {
                       ) : (
                         <></>
                       )}
-                      {!hasManagerPermissions() && topic.status === Status.VOTING && !alreadyVoted() ? (
+                      {!hasManagerPermissions() && Number(topic.status) === Status.VOTING && !alreadyVoted() ? (
                         <button className="btn btn-success me-2" onClick={() => btnVoteClick(Options.YES)}>
                           <i className="material-icons opacity-10 me-2">thumb_up</i>
                           Vote Yes
@@ -359,7 +370,7 @@ function TopicPage() {
                       ) : (
                         <></>
                       )}
-                      {!hasManagerPermissions() && topic.status === Status.VOTING && !alreadyVoted() ? (
+                      {!hasManagerPermissions() && Number(topic.status) === Status.VOTING && !alreadyVoted() ? (
                         <button className="btn btn-warning me-2" onClick={() => btnVoteClick(Options.ABSTENTION)}>
                           <i className="material-icons opacity-10 me-2">thumbs_up_down</i>
                           Don't Vote
@@ -367,15 +378,15 @@ function TopicPage() {
                       ) : (
                         <></>
                       )}
-                      {!hasManagerPermissions() && topic.status === Status.VOTING && !alreadyVoted() ? (
+                      {!hasManagerPermissions() && Number(topic.status) === Status.VOTING && !alreadyVoted() ? (
                         <button className="btn btn-danger me-2" onClick={() => btnVoteClick(Options.NO)}>
                           <i className="material-icons opacity-10 me-2">thumb_down</i>
-                          Vote Yes
+                          Vote No
                         </button>
                       ) : (
                         <></>
                       )}
-                      {hasManagerPermissions() && topic.status === Status.APPROVED && topic.category === Category.SPENT ? (
+                      {hasManagerPermissions() && Number(topic.status) === Status.APPROVED && Number(topic.category) === Category.SPENT ? (
                         <button className="btn bg-gradient-dark me-2" onClick={btnTransferClick}>
                           <i className="material-icons opacity-10 me-2">payments</i>
                           Transfer Payment
@@ -390,7 +401,11 @@ function TopicPage() {
               </div>
             </div>
           </div>
-          {title ? <TopicFiles title={title} status={topic.status} /> : <></>}
+          { 
+            title ? 
+            <TopicFiles title={title} status={topic.status} /> : 
+            <></>
+          }
           <Footer />
         </div>
       </main>

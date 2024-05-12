@@ -15,7 +15,7 @@ function TopicCategory(props: Props) {
   }
 
   return (
-    <select id="category" className="form-select px-3" value={ethers.toNumber(props.value)} onChange={onCategoryChange} disabled={props.disabled}>
+    <select id="category" className="form-select px-3" value={ethers.toNumber(props.value || 0)} onChange={onCategoryChange} disabled={props.disabled}>
       <option value="">Select...</option>
       <option value="0">Decision</option>
       <option value="1">Spent</option>

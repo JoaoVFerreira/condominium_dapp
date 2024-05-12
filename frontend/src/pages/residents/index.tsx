@@ -21,7 +21,7 @@ export default function Residents() {
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>(""); 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [count, setCount] = useState<ethers.BigNumberish>(0 as ethers.BigNumberish);
+  const [count, setCount] = useState<ethers.BigNumberish>(0n);
   
   useEffect(() => {
     setIsLoading(true);
@@ -32,7 +32,6 @@ export default function Residents() {
       setIsLoading(false);
     }).catch((err: any) => {
       setIsLoading(false);
-      console.log(err);
       setError(err.message);
     });
 
