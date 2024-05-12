@@ -46,37 +46,51 @@ This project is a Decentralized Autonomous Organization (DAO) aimed at reducing 
 
 ## How to use
 
-. precisa de uma conta em um cliente de carteira como metamask ou outros...
-. precisa criar uma conta e mudar para bsc test net, pois é a blockchain de testnet a qual o smart contrat tá deploiado
-. fazer downlodo do projeto 
-. criar a pasta file na raiz do projeto backend para armazenar arquivos dos tópicos
-. rodar npm install 
-. yarn dev (subir o backend)
-. rodar npm install para o front
-. rodar yarn start para o front
-. configurar envs
-. criar um banco local postgresl através do scprit no back
-.  
+backend **.env** suggestion
 
-
-
-1. Clone the repo
 ``` bash
-git clone https://your-repo-url.git
+DB_USERNAME=postgres
+DB_PASSWORD=admin123
+DB_NAME=condominium
+DB_HOST=localhost
+DB_PORT=5432
+TIMEZONE=America/Sao_Paulo
+DIALECT=postgres
+DATABASE_URL=postgres://postgres:admin123@localhost:5432/condominium?sslmode=disable
+PORT=8000
+JWT_SECRET="any"
+JWT_EXPIRES=36000
+CORS_ORIGIN="*"
+``` 
+frontend **.env** suggestion
+
+``` bash
+REACT_APP_ADAPTER_ADDRESS=0x57f16AfA888ADBF90714C96b0c506Bd64BA8525c
+REACT_APP_API_URL=http://localhost:8000
+``` 
+
+blockchain **.env** suggestion
+
+``` bash
+SECRET=yourSecret
+API_KEY=yourApiKey
+BSC_URL=https://data-seed-prebsc-1-s1.binance.org:8545/
+CHAIN_ID=97
+``` 
+
+- Clone the repo
+``` bash
+git clone https://github.com/JoaoVFerreira/condominium_dapp.git
 ```
 
-2. Install dependencies
-``` bash
-npm install
-```
-
-3. Start the dev server
-``` bash
-npm run dev
-```
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+- Requires an account on a wallet client like Metamask or others...
+- Adding BNB through a faucet. [BNB Faucet](https://www.bnbchain.org/en/testnet-faucet)
+- Need to create an account and switch to BSC test net, as it's the testnet blockchain where the smart contract is deployed.
+- Create a 'file' folder in the root of the backend project to store topic files.
+- Use suggested **env.**
+- Create a local PostgreSQL database using the script in the backend.
+- Run npm install and npm run start for the frontend.
+- Run npm install and npm run dev for the backend.
 
 ## License
-This project is available under the [MIT License](LICENSE).
+This project is available under the **MIT License**
